@@ -94,7 +94,12 @@ int main(int argc, char *argv[])
             {
                 printf("\n");
             }
+            else
+            {
+                printf("\r");
+            }
         }
+        printf("\n");
         
         //microsleep to give up CPU
         usleep(100);
