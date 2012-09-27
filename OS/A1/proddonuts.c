@@ -98,12 +98,19 @@ int main(int argc, char *argv[])
     while(1)
     {
         j = get_random_number();
-        p(semid[PROD],j); //lock
+        if (p(semid[PROD],j) == -1)//lock
+        {
+            sig_handler(-1);
+        }
+        
         shared_ring->flavor[j][in_ptr[j]] = serial[j];
         printf("Donut:%d\t Serial Number:%d\n",j,shared_ring->flavor[j][in_ptr[j]]);
         in_ptr[j] = (in_ptr[j] + 1) % NUMSLOTS;
         serial[j]++;
-        v(semid[CONSUMER],j);
+        if (v(semid[CONSUMER],j) == -1)
+        {
+            sig_handler(-1);
+        }
     }
     return 0;
 }
