@@ -18,7 +18,15 @@ int main(int argc, char *argv[])
 {
     struct donut_ring *shared_ring;
     int i,j,k;
-
+    int donuts[NUMFLAVORS][12];
+    int counter[NUMFLAVORS];
+    
+    for (i = 0;i<NUMFLAVORS;i++)
+    {
+        counter[i] = 0;
+    }
+    
+    
     //shared memory
     if ((shmid = shmget(MEMKEY, sizeof (struct donut_ring), 0)) == -1)
     {
@@ -29,7 +37,7 @@ int main(int argc, char *argv[])
     {
         perror("shared attach failed: ");
     }
-     //shemaphores
+    //shemaphores
     for (i = 0; i<NUMSEMIDS; i++)
     {
         if ((semid[i] = semget(SEMKEY+i, NUMFLAVORS, 0)) == -1)
@@ -37,19 +45,38 @@ int main(int argc, char *argv[])
             perror("semaphore allocation failed: ");
         }
     }
-       
+    
     for (i = 0;i < 10; i++)
     {
-        for (j = 0;j<12;j++)
+        for (k = 0;k<12;k++)
         {
-            k = get_random_number();
-            
+            j = get_random_number();
+            int donut_outptr;
+            p(semid[CONSUMER],j);//take ticket
+            p(semid[OUTPTR],j);//lock the outptr
+            donut_outptr = shared_ring->outptr[j];
+            donuts[j][counter[j]] = shared_ring->flavor[j][donut_outptr];
+            shared_ring->outptr[j]=(donut_outptr + 1) % NUMSLOTS;
+            v(semid[OUTPTR],j);//unlock the outptr
+            counter[j]++;
+            v(semid[PROD],j);//allow producer to make another donut in that slot
+            printf("Donut: %d\tSerial Number: %d\n",j,donuts[j][counter[j] - 1]);
         }
-        struct tm * timeinfo;
-        localtime (&timeinfo);
-        char buffer[80];
-        strftime(buffer,80,"%Y-%m-%d %H:%M:%S",&timeinfo);
-        printf("consumer process PID: %d\ttime: %s\t\t dozen #: %d\n",getpid(),buffer,i);
+
+        //print out of donut information
+        struct timeval tv; 
+        struct tm* ptm; 
+        char time_string[40]; 
+        long useconds; 
+        gettimeofday (&tv, NULL); 
+        ptm = localtime (&tv.tv_sec); 
+        strftime (time_string, sizeof (time_string), "%H:%M:%S", ptm); 
+        useconds = tv.tv_usec; 
+        printf("consumer process PID: %d\ttime: %s.%06ld\t dozen #: %d\n",getpid(),time_string, useconds,i);
+        printf("\n");
+        printf("plain\tjelly\tcoconut\thoney-dip\n");
+        
+        //microsleep to give up CPU
         usleep(100);
     }
     return 0;
