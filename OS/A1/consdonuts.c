@@ -1,6 +1,7 @@
 #include "donuts.h"
 
 int shmid, semid[3];
+void sig_handler(int sig);
 
 int get_random_number(void)
 {
@@ -21,9 +22,30 @@ int main(int argc, char *argv[])
     int donuts[NUMFLAVORS][12];
     int counter[NUMFLAVORS];
     
-
     
-    
+    //Signal catching 
+    sigset_t mask_sigs;
+    int nsigs;
+    struct sigaction new_action;
+    int sigs[] = {SIGHUP,SIGINT,SIGQUIT,SIGBUS,SIGTERM,SIGSEGV,SIGFPE};
+    nsigs = sizeof(sigs)/sizeof(int);
+    sigemptyset(&mask_sigs);
+    for (i = 0; i< nsigs ; i++)
+    {
+        sigaddset(&mask_sigs,sigs[i]);
+    }
+    for (i = 0; i < nsigs; i++)
+    {
+        new_action.sa_handler = sig_handler;
+        new_action.sa_mask = mask_sigs;
+        new_action.sa_flags = 0;
+        
+        if (sigaction (sigs[i],&new_action,NULL) == -1)
+        {
+            perror("can't set signals: ");
+            exit(1);
+        }
+    }
     //shared memory
     if ((shmid = shmget(MEMKEY, sizeof (struct donut_ring), 0)) == -1)
     {
@@ -53,16 +75,36 @@ int main(int argc, char *argv[])
         {
             j = get_random_number();
             int donut_outptr;
-            p(semid[CONSUMER],j);//take ticket
-            p(semid[OUTPTR],j);//lock the outptr
+            //take ticket
+            if (p(semid[CONSUMER],j) == -1)
+            {
+                perror("test1: ");
+                sig_handler(-1);
+            }
+            //lock the outptr
+            if (p(semid[OUTPTR],j) == -1)
+            {
+                perror("test2: ");
+                sig_handler(-1);
+            }
             donuts[j][counter[j]] = shared_ring->flavor[j][shared_ring->outptr[j]];
             shared_ring->outptr[j]=(shared_ring->outptr[j] + 1) % NUMSLOTS;
-            v(semid[OUTPTR],j);//unlock the outptr
-            v(semid[PROD],j);//allow producer to make another donut in that slot
+            //unlock the outptr
+            if (v(semid[OUTPTR],j) == -1)
+            {
+                perror("test3: ");
+                sig_handler(-1);
+            }
+            //allow producer to make another donut in that slot
+            if (v(semid[PROD],j) == -1)
+            {
+                perror("test4: ");
+                sig_handler(-1);
+            }
             printf("Donut: %d\tSerial Number: %d\n",j,donuts[j][counter[j]]);
             counter[j]++;
         }
-
+        
         //print out of donut information
         struct timeval tv; 
         struct tm* ptm; 
@@ -108,3 +150,12 @@ int main(int argc, char *argv[])
     }
     return 0;
 }
+
+void sig_handler(int sig)
+{
+    int i,j,k;
+    printf("In signal hanlder with signal # %d\n", sig);
+    exit(5);
+}
+
+

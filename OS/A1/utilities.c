@@ -24,7 +24,7 @@ int v(int semidgroup, int donut_type)
     
     if (semop(semidgroup, &semopbuf,1) == -1)
     {
-        perror("q operation failed: ");
+        perror("v operation failed: ");
         return (-1);
     }
     return 0;
