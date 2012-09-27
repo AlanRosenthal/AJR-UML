@@ -1,0 +1,231 @@
+Donut: 0	Serial Number: 16
+Donut: 2	Serial Number: 9
+Donut: 1	Serial Number: 12
+Donut: 1	Serial Number: 13
+Donut: 2	Serial Number: 10
+Donut: 1	Serial Number: 14
+Donut: 2	Serial Number: 11
+Donut: 1	Serial Number: 15
+Donut: 2	Serial Number: 12
+Donut: 1	Serial Number: 16
+Donut: 2	Serial Number: 13
+Donut: 2	Serial Number: 14
+------------------------------------------------------------------------
+consumer process PID: 10240	time: 16:10:46.663026	 dozen #: 0
+
+plain	jelly	coconut	honey-dip
+16	12	9		
+	13	10		
+	14	11		
+	15	12		
+	16	13		
+		14		
+																								------------------------------------------------------------------------
+
+Donut: 3	Serial Number: 17
+Donut: 2	Serial Number: 23
+Donut: 2	Serial Number: 24
+Donut: 1	Serial Number: 28
+Donut: 3	Serial Number: 18
+Donut: 2	Serial Number: 26
+Donut: 3	Serial Number: 24
+Donut: 2	Serial Number: 30
+Donut: 1	Serial Number: 37
+Donut: 1	Serial Number: 38
+Donut: 2	Serial Number: 33
+Donut: 2	Serial Number: 34
+------------------------------------------------------------------------
+consumer process PID: 10240	time: 16:10:46.663513	 dozen #: 1
+
+plain	jelly	coconut	honey-dip
+	28	23	17	
+	37	24	18	
+	38	26	24	
+		30		
+		33		
+		34		
+																								------------------------------------------------------------------------
+
+Donut: 1	Serial Number: 51
+Donut: 0	Serial Number: 42
+Donut: 2	Serial Number: 36
+Donut: 0	Serial Number: 44
+Donut: 3	Serial Number: 34
+Donut: 3	Serial Number: 35
+Donut: 1	Serial Number: 53
+Donut: 3	Serial Number: 36
+Donut: 1	Serial Number: 54
+Donut: 0	Serial Number: 47
+Donut: 3	Serial Number: 38
+Donut: 1	Serial Number: 56
+------------------------------------------------------------------------
+consumer process PID: 10240	time: 16:10:46.663738	 dozen #: 2
+
+plain	jelly	coconut	honey-dip
+42	51	36	34	
+44	53		35	
+47	54		36	
+	56		38	
+																																------------------------------------------------------------------------
+
+Donut: 3	Serial Number: 48
+Donut: 0	Serial Number: 62
+Donut: 3	Serial Number: 49
+Donut: 1	Serial Number: 64
+Donut: 3	Serial Number: 50
+Donut: 2	Serial Number: 50
+Donut: 0	Serial Number: 65
+Donut: 2	Serial Number: 54
+Donut: 2	Serial Number: 56
+Donut: 2	Serial Number: 59
+Donut: 2	Serial Number: 63
+Donut: 3	Serial Number: 55
+------------------------------------------------------------------------
+consumer process PID: 10240	time: 16:10:46.664105	 dozen #: 3
+
+plain	jelly	coconut	honey-dip
+62	64	50	48	
+65		54	49	
+		56	50	
+		59	55	
+		63		
+																												------------------------------------------------------------------------
+
+Donut: 1	Serial Number: 80
+Donut: 3	Serial Number: 65
+Donut: 2	Serial Number: 71
+Donut: 1	Serial Number: 83
+Donut: 0	Serial Number: 84
+Donut: 2	Serial Number: 73
+Donut: 2	Serial Number: 74
+Donut: 1	Serial Number: 85
+Donut: 0	Serial Number: 85
+Donut: 1	Serial Number: 87
+Donut: 1	Serial Number: 90
+Donut: 2	Serial Number: 78
+------------------------------------------------------------------------
+consumer process PID: 10240	time: 16:10:46.664383	 dozen #: 4
+
+plain	jelly	coconut	honey-dip
+84	80	71	65	
+85	83	73		
+	85	74		
+	87	78		
+	90			
+																												------------------------------------------------------------------------
+
+Donut: 1	Serial Number: 98
+Donut: 2	Serial Number: 84
+Donut: 2	Serial Number: 85
+Donut: 2	Serial Number: 86
+Donut: 1	Serial Number: 99
+Donut: 2	Serial Number: 87
+Donut: 1	Serial Number: 100
+Donut: 1	Serial Number: 101
+Donut: 0	Serial Number: 101
+Donut: 3	Serial Number: 81
+Donut: 0	Serial Number: 103
+Donut: 1	Serial Number: 103
+------------------------------------------------------------------------
+consumer process PID: 10240	time: 16:10:46.664621	 dozen #: 5
+
+plain	jelly	coconut	honey-dip
+101	98	84	81	
+103	99	85		
+	100	86		
+	101	87		
+	103			
+																												------------------------------------------------------------------------
+
+Donut: 3	Serial Number: 90
+Donut: 2	Serial Number: 100
+Donut: 0	Serial Number: 114
+Donut: 2	Serial Number: 101
+Donut: 1	Serial Number: 116
+Donut: 3	Serial Number: 91
+Donut: 1	Serial Number: 117
+Donut: 0	Serial Number: 117
+Donut: 0	Serial Number: 119
+Donut: 1	Serial Number: 120
+Donut: 3	Serial Number: 95
+Donut: 1	Serial Number: 122
+------------------------------------------------------------------------
+consumer process PID: 10240	time: 16:10:46.664896	 dozen #: 6
+
+plain	jelly	coconut	honey-dip
+114	116	100	90	
+117	117	101	91	
+119	120		95	
+	122			
+																																------------------------------------------------------------------------
+
+Donut: 1	Serial Number: 126
+Donut: 1	Serial Number: 127
+Donut: 1	Serial Number: 128
+Donut: 0	Serial Number: 131
+Donut: 2	Serial Number: 116
+Donut: 3	Serial Number: 105
+Donut: 1	Serial Number: 130
+Donut: 1	Serial Number: 131
+Donut: 0	Serial Number: 137
+Donut: 2	Serial Number: 122
+Donut: 2	Serial Number: 123
+Donut: 0	Serial Number: 138
+------------------------------------------------------------------------
+consumer process PID: 10240	time: 16:10:46.665413	 dozen #: 7
+
+plain	jelly	coconut	honey-dip
+131	126	116	105	
+137	127	122		
+138	128	123		
+	130			
+	131			
+																												------------------------------------------------------------------------
+
+Donut: 3	Serial Number: 121
+Donut: 0	Serial Number: 143
+Donut: 0	Serial Number: 144
+Donut: 0	Serial Number: 145
+Donut: 2	Serial Number: 132
+Donut: 1	Serial Number: 145
+Donut: 0	Serial Number: 147
+Donut: 2	Serial Number: 134
+Donut: 0	Serial Number: 150
+Donut: 3	Serial Number: 127
+Donut: 1	Serial Number: 148
+Donut: 0	Serial Number: 153
+------------------------------------------------------------------------
+consumer process PID: 10240	time: 16:10:46.665879	 dozen #: 8
+
+plain	jelly	coconut	honey-dip
+143	145	132	121	
+144	148	134	127	
+145				
+147				
+150				
+153				
+																								------------------------------------------------------------------------
+
+Donut: 3	Serial Number: 131
+Donut: 0	Serial Number: 155
+Donut: 3	Serial Number: 132
+Donut: 3	Serial Number: 133
+Donut: 2	Serial Number: 139
+Donut: 0	Serial Number: 156
+Donut: 3	Serial Number: 134
+Donut: 3	Serial Number: 135
+Donut: 2	Serial Number: 140
+Donut: 0	Serial Number: 157
+Donut: 2	Serial Number: 141
+Donut: 1	Serial Number: 155
+------------------------------------------------------------------------
+consumer process PID: 10240	time: 16:10:46.666116	 dozen #: 9
+
+plain	jelly	coconut	honey-dip
+155	155	139	131	
+156		140	132	
+157		141	133	
+			134	
+			135	
+																												------------------------------------------------------------------------
+

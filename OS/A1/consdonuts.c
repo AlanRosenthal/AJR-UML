@@ -78,13 +78,11 @@ int main(int argc, char *argv[])
             //take ticket
             if (p(semid[CONSUMER],j) == -1)
             {
-                perror("test1: ");
                 sig_handler(-1);
             }
             //lock the outptr
             if (p(semid[OUTPTR],j) == -1)
             {
-                perror("test2: ");
                 sig_handler(-1);
             }
             donuts[j][counter[j]] = shared_ring->flavor[j][shared_ring->outptr[j]];
@@ -92,13 +90,11 @@ int main(int argc, char *argv[])
             //unlock the outptr
             if (v(semid[OUTPTR],j) == -1)
             {
-                perror("test3: ");
                 sig_handler(-1);
             }
             //allow producer to make another donut in that slot
             if (v(semid[PROD],j) == -1)
             {
-                perror("test4: ");
                 sig_handler(-1);
             }
             printf("Donut: %d\tSerial Number: %d\n",j,donuts[j][counter[j]]);
@@ -137,11 +133,8 @@ int main(int argc, char *argv[])
             {
                 printf("\n");
             }
-            else
-            {
-                printf("\r");
-            }
         }
+        printf("\r");
         printf("------------------------------------------------------------------------\n");
         printf("\n");
         
@@ -157,5 +150,3 @@ void sig_handler(int sig)
     printf("In signal hanlder with signal # %d\n", sig);
     exit(5);
 }
-
-

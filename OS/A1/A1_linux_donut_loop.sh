@@ -30,7 +30,17 @@ echo "Working on LOOP $lpcnt"
 echo " "
 ./proddonuts >  prod_out.txt & 
 sleep 1 
-./consdonuts 1 > c1 & ./consdonuts 2 > c2 & ./consdonuts 3 > c3 & ./consdonuts 4 > c4 & ./consdonuts 5 > c5 &
+./consdonuts 1 > c1 &
+./consdonuts 2 > c2 &
+./consdonuts 3 > c3 &
+#./consdonuts 4 > c4 &
+#./consdonuts 5 > c5 &
+#./consdonuts 6 > c1 &
+#./consdonuts 7 > c2 &
+#./consdonuts 8 > c3 &
+#./consdonuts 9 > c4 &
+#./consdonuts 10 > c5 &
+
 sleep 15
 pid=`ps | grep -v 'grep' | grep 'proddonuts' | cut -c1-6`
 if ps | grep -v 'grep' | grep -q 'consdonuts'
