@@ -58,9 +58,9 @@ int main(int argc, char *argv[])
             donuts[j][counter[j]] = shared_ring->flavor[j][shared_ring->outptr[j]];
             shared_ring->outptr[j]=(shared_ring->outptr[j] + 1) % NUMSLOTS;
             v(semid[OUTPTR],j);//unlock the outptr
-            counter[j]++;
             v(semid[PROD],j);//allow producer to make another donut in that slot
-            printf("Donut: %d\tSerial Number: %d\n",j,donuts[j][counter[j] - 1]);
+            printf("Donut: %d\tSerial Number: %d\n",j,donuts[j][counter[j]]);
+            counter[j]++;
         }
 
         //print out of donut information
@@ -75,6 +75,26 @@ int main(int argc, char *argv[])
         printf("consumer process PID: %d\ttime: %s.%06ld\t dozen #: %d\n",getpid(),time_string, useconds,i);
         printf("\n");
         printf("plain\tjelly\tcoconut\thoney-dip\n");
+        for (k = 0;k<12;k++)
+        {
+            int rowtest = 0;
+            for (j = 0; j< NUMFLAVORS; j++)
+            {
+                if (counter[j] > k)
+                {
+                    printf("%d\t",donuts[j][k]);
+                    rowtest++;
+                }
+                else
+                {
+                    printf("\t");
+                }
+            }
+            if (rowtest > 0)
+            {
+                printf("\n");
+            }
+        }
         
         //microsleep to give up CPU
         usleep(100);
