@@ -21,10 +21,7 @@ int main(int argc, char *argv[])
     int donuts[NUMFLAVORS][12];
     int counter[NUMFLAVORS];
     
-    for (i = 0;i<NUMFLAVORS;i++)
-    {
-        counter[i] = 0;
-    }
+
     
     
     //shared memory
@@ -48,15 +45,18 @@ int main(int argc, char *argv[])
     
     for (i = 0;i < 10; i++)
     {
+        for (k = 0;k<NUMFLAVORS;k++)
+        {
+            counter[k] = 0;
+        }
         for (k = 0;k<12;k++)
         {
             j = get_random_number();
             int donut_outptr;
             p(semid[CONSUMER],j);//take ticket
             p(semid[OUTPTR],j);//lock the outptr
-            donut_outptr = shared_ring->outptr[j];
-            donuts[j][counter[j]] = shared_ring->flavor[j][donut_outptr];
-            shared_ring->outptr[j]=(donut_outptr + 1) % NUMSLOTS;
+            donuts[j][counter[j]] = shared_ring->flavor[j][shared_ring->outptr[j]];
+            shared_ring->outptr[j]=(shared_ring->outptr[j] + 1) % NUMSLOTS;
             v(semid[OUTPTR],j);//unlock the outptr
             counter[j]++;
             v(semid[PROD],j);//allow producer to make another donut in that slot
