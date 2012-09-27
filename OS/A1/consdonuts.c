@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
         ptm = localtime (&tv.tv_sec); 
         strftime (time_string, sizeof (time_string), "%H:%M:%S", ptm); 
         useconds = tv.tv_usec; 
+        printf("------------------------------------------------------------------------\n");
         printf("consumer process PID: %d\ttime: %s.%06ld\t dozen #: %d\n",getpid(),time_string, useconds,i);
         printf("\n");
         printf("plain\tjelly\tcoconut\thoney-dip\n");
@@ -99,6 +100,7 @@ int main(int argc, char *argv[])
                 printf("\r");
             }
         }
+        printf("------------------------------------------------------------------------\n");
         printf("\n");
         
         //microsleep to give up CPU
