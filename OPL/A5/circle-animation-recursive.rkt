@@ -1,8 +1,8 @@
-;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname circle-animation-recursive) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ())))
+#lang racket
+
 (require 2htdp/image)
 (require 2htdp/universe)
+
 
 ;; (show-circles show-satatus-window?) -> image?
 ;; show-status-window? : boolean
@@ -33,8 +33,9 @@
               [else w])))))
 ;; (random-color) -> image-color?
 (define random-color
-  (let ([x 25])
-    (make-color (+ x (random 230)) (+ x (random 230)) (+ x (random 230)))))
+  (lambda ()
+    (let ([x 25])
+      (make-color (+ x (random 230)) (+ x (random 230)) (+ x (random 230))))))
 
 
 ;; (concentric-circles max-radius increment) -> image?
