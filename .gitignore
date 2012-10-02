@@ -13,3 +13,6 @@
 
 #temp files
 *.*~
+
+#racket files
+*.rkt#?#
