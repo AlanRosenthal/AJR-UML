@@ -1,5 +1,5 @@
 ; Alan Rosenthal
-; Assigment 5
+; Assignment 5
 ; 10/2/2012
 
 #lang racket
@@ -49,12 +49,12 @@
   (lambda (max-radius increment)
     (let ([a-color (random-color)])
       (letrec
-          ((concentric-circles-iter
-            (lambda (radius)
-              (if (> radius max-radius)
-                  empty-image
-                  (overlay (circle radius "outline" a-color) (concentric-circles-iter (+ radius increment)))))))
-        (concentric-circles-iter 1)))))
+          ((lots-of-circles
+            (lambda (img radius)
+              (if (> radius max-radius increment)
+                  img
+                  (lots-of-circles (overlay img (circle radius "outline" a-color)) (+ radius increment))))))
+        (lots-of-circles empty-image 1)))))
 
 ;Checks concentric-circles
 (check-equal?
