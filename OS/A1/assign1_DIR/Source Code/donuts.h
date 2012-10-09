@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SEMKEY          (key_t)6175952400
-#define MEMKEY          (key_t)6175952400
+#define SEMKEY          (key_t)617595240
+#define MEMKEY          (key_t)617595240
 #define NUMFLAVORS      4
 #define NUMSLOTS        60
 #define NUMSEMIDS       3
