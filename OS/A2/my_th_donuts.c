@@ -14,7 +14,8 @@ typedef struct {
    int outptr[NUMFLAVORS];
    int in_ptr[NUMFLAVORS];
    int serial[NUMFLAVORS];
-   int donuts[NUMFLAVORS];
+   int donut_counter[NUMFLAVORS];
+   int space_counter[NUMFLAVORS];
 } donut_ring;
 
 // SIGNAL WAITER, PRODUCER AND CCONSUMER THREAD FUCCTIONS
@@ -25,6 +26,7 @@ void * consumer(void * arg);
 
 //GLOBAL VARIABLES
 donut_ring shared_ring;
+
 pthread_mutex_t prod[NUMFLAVORS];
 pthread_mutex_t cons[NUMFLAVORS];
 pthread_cond_t prod_cond[NUMFLAVORS];
@@ -65,7 +67,8 @@ int main(int argc, char * argv[])
       shared_ring.outptr[i] = 0;
       shared_ring.in_ptr[i] = 0;
       shared_ring.serial[i] = 0;
-      shared_ring.donuts[i] = 0;
+      shared_ring.space_counter[i] = NUMSLOTS;
+      shared_ring.donut_counter[i] = 0;
    }
    
    //SETUP FOR MANAGING THE SIGTERM SIGNAL, BLOCK ALL SIGNALS
@@ -146,4 +149,41 @@ int main(int argc, char * argv[])
    printf("Elapsed cons time is %d sec and %d usec\n",i,j);
    printf("\n\n ALL CONSUMERS FINISHED, KILLING PROCESS\n\n");
    return 0;
+}
+
+void * producer(void *arg)
+{
+   int i,j,k;
+   unsigned short xsub[3];
+   struct timeval randtime;
+   gettimeofday(&randtime, (struct timezone *) 0);
+   xsub[0] = (unsigned short) randtime.tv_usec;
+   xsub[1] = (unsigned short) (randtime.tv_usec >> 16);
+   xsub[2] = (unsigned short) pthread_self();
+   while (1)
+   {
+      j = nrand48(xsub) & 3;
+      //Get Producer Mutex
+      pthread_mutex_lock(&prod[j]);
+      //Check Space count
+      while (shared_ring.space_counter == 0)
+      {
+         pthread_cond_wait(&prod_cond[j],&prod[j]);
+      }
+      //Put Donut in Queue
+      int in_ptr = shared_ring.in_ptr[j];
+      shared_ring.flavor[j][in_ptr] = shared_ring.serial[j]++;
+      shared_ring.in_ptr[j] = (in_ptr + 1) % NUMSLOTS;
+      shared_ring.space_counter[j]--;
+      //unlock producer mutex
+      pthread_mutex_unlock(&prod[j]);
+      //get consumer mutex
+      pthread_mutex_lock(&cons[j]);
+      //increase donut counter
+      shared_ring.donut_counter[j]++;
+      //unlock consumer mutex
+      pthread_mutex_unlock(&cons[j]);
+      //signal cons_condx_var      
+   }
+   return NULL;
 }
