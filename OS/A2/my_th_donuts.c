@@ -3,12 +3,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#define NUMFLAVORS      4
-#define NUMSLOTS        500
-#define NUMPRODUCERS    30
-#define NUMCONSUMERS    50
-#define NUMDOZENS       200
+#include "my_th_donuts.h"
 
 typedef struct {
    int flavor[NUMFLAVORS][NUMSLOTS];
@@ -57,8 +52,6 @@ int main(int argc, char * argv[])
    pthread_attr_t thread_attr;
    struct sched_param sched_struct;
    
-   printf("\n\n");
-   
    //INITIAL TIMESTAMP VALUE FOR PERFORMANCE MEASURE
    gettimeofday(&first_time, (struct timezone *) 0);
    for (i = 0; i < NUMCONSUMERS + 1; i++)
@@ -101,7 +94,7 @@ int main(int argc, char * argv[])
       }
    }
    
-   printf("Signals set up\n");
+   //printf("Signals set up\n");
    
    //CREATE SIGNAL HANDLER THREAD, PRODUCER, CONSUMERS
    if (pthread_create(&sig_wait_id,NULL,sig_waiter,NULL) != 0)
@@ -133,13 +126,8 @@ int main(int argc, char * argv[])
       printf("DeadLock Detector pthread_create failed: ");
       exit (3);
    }
-   printf("Threads created\n");
+   //printf("Threads created\n");
    
-//    for (i = 0; i < NUMCONSUMERS; i++)
-//    {
-//       pthread_join(thread_id[i],NULL);
-//       printf("Consumer %d finished\n",i);
-//    }
    pthread_join(deadlock_id,NULL);
    
    gettimeofday(&last_time, (struct timezone *) 0);
@@ -160,8 +148,8 @@ int main(int argc, char * argv[])
       }
    }
    printf("Elapsed cons time is %d sec and %d usec\n",i,j);
-   printf("\nALL CONSUMERS FINISHED, KILLING PROCESS (%d)\n\n",deadlock_val);
-   return 0;
+   printf("Result: %d\n",deadlock_val);
+   return deadlock_val;
 }
 
 void * producer(void * arg)
@@ -357,9 +345,9 @@ void * deadlock_detector(void * arg)
       }
       for (i = 0; i < NUMCONSUMERS; i++)
       {
-         printf("%03d ",shared_ring.num_dozens[i]);
+         //printf("%03d ",shared_ring.num_dozens[i]);
       }
-      printf("(%d)(%d)\n",j,k);
+     // printf("(%d)(%d)\n",j,k);
       usleep(100);
    }
 }
