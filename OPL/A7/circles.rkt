@@ -1,3 +1,7 @@
+; Alan Rosenthal
+; A7
+; 12 November 2012
+
 #lang racket
 
 (require 2htdp/image)
