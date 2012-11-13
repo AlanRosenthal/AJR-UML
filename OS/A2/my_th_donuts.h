@@ -1,0 +1,5 @@
+#define NUMFLAVORS 4
+#define NUMSLOTS 550
+#define NUMPRODUCERS 30
+#define NUMCONSUMERS 50
+#define NUMDOZENS 200
