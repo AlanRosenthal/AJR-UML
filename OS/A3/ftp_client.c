@@ -31,11 +31,12 @@ int main(int argc, char * argv[])
    inet_telnum.sin_family = AF_INET;
    inet_telnum.sin_port = htons((u_short)PORT);
    
-   if (connect(inet_sock, (struct sockaddr *)&inet_telnum,sizeof(struct sockaddr_in)) == -1)
+   if ((temp = connect(inet_sock, (struct sockaddr *)&inet_telnum,sizeof(struct sockaddr_in))) == -1)
    {
       perror("inet_sock connect failed: ");
       exit(2);
    }
+   printf("%d\n",temp);
    make_header(&msg, RECV, (local_size=strlen(string_to_send) + 1));
    strcpy(msg.mbody,string_to_send);
 
@@ -47,6 +48,8 @@ int main(int argc, char * argv[])
       perror("inet_sock write failed: ");
       exit(3);
    }
-   printf("%d\n",temp);
+   printf("%d %d\n",temp,close(inet_sock));
+   
+
    printf("closing...\n");
 }
