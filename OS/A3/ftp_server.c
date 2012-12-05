@@ -56,7 +56,7 @@ int main (int argc, char * argv[])
    }
    
    listen(inet_sock,5);
-   printf("listening...?\n");
+   printf("listening...(pid: %d)\n",getpid());
    while (1)
    {
       fromlen = sizeof(struct sockaddr);
@@ -77,10 +77,12 @@ int main (int argc, char * argv[])
             exit(1);
             
          case 0:
+            printf("new connection...(pid: %d %d)\n",getpid(),getppid());
             close(inet_sock);
             while(1)
             {
-               read_header(&new_sock,&raw.buf);
+               printf("new sock %d\n",new_sock);
+               read_header(new_sock,&raw.buf);
                type_val = ntohl(raw.m.mtype);
                size_val = ntohl(raw.m.msize);
                read_val = size_val;
@@ -89,6 +91,8 @@ int main (int argc, char * argv[])
                {
                   case RECV:
                      printf("RECV\n");
+                     converge_read(new_sock, buffer_ptr,read_val);
+                     printf("raw msg: %s\n",raw.buf);
                      break;
                   case TEST:
                      printf("TEST\n");
@@ -97,6 +101,7 @@ int main (int argc, char * argv[])
                      printf("typeval: %d\n",type_val);
                      break;
                }
+               printf("exiting...\n");
                exit(0);
             }
             break;
