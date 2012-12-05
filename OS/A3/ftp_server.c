@@ -9,6 +9,7 @@ void child_handler (int signum)
 
 int main (int argc, char * argv[])
 {
+   printf("Starting FTP Server...\n");
    MSG msg;
    MBUF raw;
    int inet_sock,new_sock,local_file;
@@ -23,7 +24,7 @@ int main (int argc, char * argv[])
    sigset_t mask;
    
    //set up sigaction structure to clean zombies
-   sigemprtyset(&mask);
+   sigemptyset(&mask);
    sigstrc.sa_handler = child_handler;
    sigstrc.sa_mask = mask;
    sigstrc.sa_flags = 0;
@@ -55,7 +56,7 @@ int main (int argc, char * argv[])
    }
    
    listen(inet_sock,5);
-   
+   printf("listening...?\n");
    while (1)
    {
       fromlen = sizeof(struct sockaddr);
