@@ -77,11 +77,10 @@ int main (int argc, char * argv[])
             exit(1);
             
          case 0:
-            printf("new connection...(pid: %d %d)\n",getpid(),getppid());
+            printf("new connection...(pid: %d, parent pid: %d)\n",getpid(),getppid());
             close(inet_sock);
             while(1)
             {
-               printf("new sock %d\n",new_sock);
                read_header(new_sock,&raw.buf);
                type_val = ntohl(raw.m.mtype);
                size_val = ntohl(raw.m.msize);
@@ -89,16 +88,10 @@ int main (int argc, char * argv[])
                buffer_ptr = raw.buf;
                switch (type_val)
                {
-                  case RECV:
-                     printf("RECV\n");
+                  default:
+                     printf("msg id: %d\n",type_val);
                      converge_read(new_sock, buffer_ptr,read_val);
                      printf("raw msg: %s\n",raw.buf);
-                     break;
-                  case TEST:
-                     printf("TEST\n");
-                     break;
-                  default:
-                     printf("typeval: %d\n",type_val);
                      break;
                }
                printf("exiting...\n");
