@@ -25,14 +25,14 @@
 #define END_TEST 103
 
 typedef struct {
-   int mtype;
-   int msize;
-   char mbody[MSG_BODY];
+    int mtype;
+    int msize;
+    char mbody[MSG_BODY];
 } MSG;
 
 typedef union {
-   MSG m;
-   char buf[MSG_SIZE];
+    MSG m;
+    char buf[MSG_SIZE];
 } MBUF;
 
 

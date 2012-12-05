@@ -14,7 +14,7 @@ int main(int argc, char * argv[])
     MBUF raw;
     int inet_sock,new_sock,local_file;
     int type_val, size_val, read_val, sleep_interval;
-    int i,j,k;
+    int i,j,k,local_size;
     char string_to_send[256];
     socklen_t fromlen;
     char * buffer_ptr;
@@ -32,9 +32,13 @@ int main(int argc, char * argv[])
     sigaction(SIGCHLD, &sigstrc, NULL);
     //if theres an arg on the command line use it to test sleep interval
     if (argc == 2)
+    {
         sleep_interval = atoi(argv[1]);
+    }
     else
+    {
         sleep_interval = 1;
+    }
     
     //allocate a socket to commuocate with
     if ((inet_sock=socket(AF_INET,SOCK_STREAM, 0)) == -1)
@@ -91,8 +95,9 @@ int main(int argc, char * argv[])
                             printf("raw msg: %s\n",raw.buf);
                             printf("enter phrase: ");
                             scanf("%s",string_to_send);
-                            make_header(&msg,DATA,strlen(string_to_send) + 1);
-                            if (write(new_sock,&msg,2*sizeof(int) + strlen(string_to_send) + 1) == -1)
+                            make_header(&msg, DATA, (local_size=strlen(string_to_send) + 1));
+                            strcpy(msg.mbody,string_to_send);
+                            if (write(new_sock,&msg,2*sizeof(int) + local_size) == -1)
                             {
                                 perror("new_sock write failed: ");
                                 exit(3);
