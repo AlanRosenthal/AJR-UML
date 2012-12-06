@@ -18,10 +18,12 @@
 
 #define PORT 4844
 
-#define PRODUCE 1  
+#define PRODUCE 1
+#define PRODUCEACK 101
+#define PRODUCENACK 201
 #define CONSUME 2
-#define TEST1 101
-#define TEST2 102
+#define CONSUMEACK 102
+#define CONSUMENACK 202
 
 typedef struct {
     int mtype;

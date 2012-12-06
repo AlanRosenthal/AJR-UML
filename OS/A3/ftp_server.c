@@ -12,12 +12,11 @@ int main(int argc, char * argv[])
     MSG msg;
     MBUF raw;
     int inet_sock,new_sock;
-    int type_val, size_val, read_val;
-    int i,j,k;
-    int flavor_id,node_id,in_ptr,serial_id;
+    int type_val, size_val;
+    int i,j,k;//counters
+    int flavor,node_id,in_ptr,serial,outptr;
     char string_to_send[256];
     socklen_t fromlen;
-    char * buffer_ptr;
     struct sockaddr_in inet_telnum;
     struct hostent *heptr, *gethostbyname();
     int wild_card = INADDR_ANY;
@@ -61,7 +60,6 @@ int main(int argc, char * argv[])
 
     for (i = 0; i < NUMFLAVORS; i++)
     {
-        printf("changing ring buffer\n");
         shared_ring->outptr[i] = 0;
         shared_ring->in_ptr[i] = 0;
         shared_ring->donut_counter[i] = 0;
@@ -111,35 +109,61 @@ int main(int argc, char * argv[])
                     switch (type_val)
                     {
                         case PRODUCE:
-                            converge_read(new_sock, raw.buf,size_val);
-                            sscanf(raw.buf,"%d %d %d",&node_id,&flavor_id,&serial_id);
-                            if (shared_ring->space_counter[flavor_id] > 0)
+                            converge_read(new_sock,raw.buf,size_val);
+                            sscanf(raw.buf,"%d %d %d",&node_id,&flavor,&serial);
+                            if (shared_ring->space_counter[flavor] > 0)
                             {
-                                in_ptr = shared_ring->in_ptr[flavor_id];
-                                shared_ring->donuts[flavor_id].node_id[in_ptr] = node_id;
-                                shared_ring->donuts[flavor_id].serial[in_ptr] = serial_id;
-                                shared_ring->donut_counter[flavor_id]++;
-                                shared_ring->space_counter[flavor_id]--;
-                                shared_ring->in_ptr[flavor_id] = (in_ptr + 1) % NUMSLOTS;
+                                in_ptr = shared_ring->in_ptr[flavor];
+                                shared_ring->donuts[flavor].node_id[in_ptr] = node_id;
+                                shared_ring->donuts[flavor].serial[in_ptr] = serial;
+                                //needs a lock
+                                shared_ring->donut_counter[flavor]++;
+                                shared_ring->space_counter[flavor]--;
+                                //needs an unlock
+                                shared_ring->in_ptr[flavor] = (in_ptr + 1) % NUMSLOTS;
+                                make_header(&msg, PRODUCEACK, 0);
+                                if (write(new_sock,&msg,2*sizeof(int)) == -1)
+                                {
+                                    perror("new_sock write failed: ");
+                                    exit(3);
+                                }
                             }
-                            printf("\t\tType 0\tType1\tType2\tType3\n");
-                            printf("Donut Counter\t%d\t%d\t%d\t%d\n",shared_ring->donut_counter[0],shared_ring->donut_counter[1],shared_ring->donut_counter[2],shared_ring->donut_counter[3]);
-                            printf("Space Counter\t%d\t%d\t%d\t%d\n",shared_ring->space_counter[0],shared_ring->space_counter[1],shared_ring->space_counter[2],shared_ring->space_counter[3]);
-                            
+                    printf("\t\tType 0\tType 1\tType 2\tType 3\nDonut Counter\t%d\t%d\t%d\t%d\n",shared_ring->donut_counter[0],shared_ring->donut_counter[1],shared_ring->donut_counter[2],shared_ring->donut_counter[3]);
                             break;
                         case CONSUME:
+                            converge_read(new_sock,raw.buf,size_val);
+                            sscanf(raw.buf,"%d",&flavor);
+                            if (shared_ring->donut_counter[flavor] > 0)
+                            {
+                                outptr = shared_ring->outptr[flavor];
+                                
+                                node_id = shared_ring->donuts[flavor].node_id[outptr];
+                                serial = shared_ring->donuts[flavor].serial[outptr];
+                                //needs a lock
+                                shared_ring->donut_counter[flavor]--;
+                                shared_ring->space_counter[flavor]++;
+                                //needs an unlock
+                                shared_ring->outptr[flavor] = (outptr + 1) % NUMSLOTS;
+                                sprintf(string_to_send,"%d %d",node_id,serial);
+                                strcpy(msg.mbody,string_to_send);
+                                make_header(&msg, CONSUMEACK, strlen(string_to_send) + 1);
+                                if (write(new_sock,&msg,2*sizeof(int) + strlen(string_to_send) + 1) == -1)
+                                {
+                                    perror("new_sock write failed: ");
+                                    exit(3);
+                                }
+                            }
+                    printf("\t\tType 0\tType 1\tType 2\tType 3\nDonut Counter\t%d\t%d\t%d\t%d\n",shared_ring->donut_counter[0],shared_ring->donut_counter[1],shared_ring->donut_counter[2],shared_ring->donut_counter[3]);
                             break;
                         
-                        
                         default:
-                            converge_read(new_sock, buffer_ptr,read_val);
+                            converge_read(new_sock,raw.buf,size_val);
                             printf("msg id: %d\n",type_val);
                             printf("raw msg: %s\n",raw.buf);
                             printf("enter phrase: ");
-                            scanf("%s",string_to_send);
-                            make_header(&msg, 00000, strlen(string_to_send) + 1);
-                            strcpy(msg.mbody,string_to_send);
-                            if (write(new_sock,&msg,2*sizeof(int) + strlen(string_to_send) + 1) == -1)
+                            make_header(&msg, 00000, strlen("this is a test") + 1);
+                            strcpy(msg.mbody,"this is a test");
+                            if (write(new_sock,&msg,2*sizeof(int) + strlen("this is a test") + 1) == -1)
                             {
                                 perror("new_sock write failed: ");
                                 exit(3);

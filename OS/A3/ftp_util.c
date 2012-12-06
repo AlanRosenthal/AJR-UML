@@ -8,11 +8,12 @@ void make_header(MSG * message_ptr, int type, int size)
 
 void read_header(int socket, char * buffer)
 {
-    int i;
+    int i,temp;
     for (i = 0; i < (2*sizeof(int)); i++)
     {
-        if (read(socket,buffer+i, 1) != 1)
+        if ((temp = read(socket,buffer+i, 1)) != 1)
         {
+            printf("Read val: %d\n",temp);
             perror("read_type_size failed: ");
             exit(3);
         }
