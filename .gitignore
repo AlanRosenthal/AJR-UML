@@ -13,6 +13,7 @@
 
 #temp files
 *~
+*.kate-swp
 
 #racket files
 *.rkt#?#

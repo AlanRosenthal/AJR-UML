@@ -8,7 +8,8 @@ int main(int argc, char * argv[])
     int type_val, size_val,read_val, local_size;
     int i,j,k,temp;
     char * buffer_ptr, * token_ptr, *last_token_ptr;
-    char string_to_send[256];
+    int command_id;
+    char string_to_send[MSG_SIZE];
     union type_size;
     struct sockaddr_in inet_telnum;
     struct hostent * heptr, * gethostbyname();
@@ -30,10 +31,11 @@ int main(int argc, char * argv[])
         perror("inet_sock connect failed: ");
         exit(2);
     }
-    
+    printf("enter command_id: ");
+    scanf("%d",&command_id);
     printf("enter phrase: ");
     scanf("%s",string_to_send);
-    make_header(&msg, RECV, (local_size=strlen(string_to_send) + 1));
+    make_header(&msg, command_id, (local_size=strlen(string_to_send) + 1));
     strcpy(msg.mbody,string_to_send);
     
     printf("mtype %d msize %d body %s\n",ntohl(msg.mtype),ntohl(msg.msize),msg.mbody);
