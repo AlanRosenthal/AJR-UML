@@ -41,6 +41,7 @@ typedef union {
 #define NUMFLAVORS 4
 #define NUMSLOTS 20
 #define NUMPRODUCERS 10
+
 #define MEMKEY (key_t)617595240
 
 

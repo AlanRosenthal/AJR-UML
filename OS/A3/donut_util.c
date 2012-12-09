@@ -1,4 +1,4 @@
-#include "donuts.h"
+#include "donut.h"
 
 void make_header(MSG * message_ptr, int type)
 {
@@ -11,8 +11,13 @@ void read_header(int socket, char * buffer)
     int i,temp;
     for (i = 0; i < (2*sizeof(int)); i++)
     {
-        if ((temp = read(socket,buffer+i, 1)) != 1)
+        while (temp = read(socket,buffer+i, 1) == 0)
         {
+	    usleep(1000);
+        }
+        if (temp != 1)
+        {
+	    printf("temp: %d\n",temp);
             perror("read_type_size failed: ");
             exit(3);
         }
@@ -35,8 +40,7 @@ void converge_read(int socket, char * buffer)
                 perror("inet_sock read failed: ");
                 exit(3);
             case 0:
-                printf("unexpected eof in inet_sock\n");
-                exit(4);
+		usleep(1000);
         }
     }
 }
