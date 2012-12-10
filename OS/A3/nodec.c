@@ -1,7 +1,7 @@
 #include "donut.h"
 
 //int node_accept(int node_id,int node_id_to_connect);
-int node_connect(int node_id,int node_id_to_connect);
+int node_connect(int node_id,int node_id_to_connect,char * IP);
 void sig_handler(int sig);
 
 int test = 0;
@@ -47,28 +47,27 @@ int main(int argc, char * argv[])
     socklen_t fromlen = sizeof(struct sockaddr);
     MSG msg;
     MBUF raw;
-    //allocate a socket to commuocate with
-if (node_id == 0){
-    if ((inet_sock=socket(AF_INET,SOCK_STREAM, 0)) == -1)
-    {
-        perror("inet_sock allocation failed");
-        exit(1);
-    }
-    bcopy(&wild_card,&inet_telnum.sin_addr, sizeof(int));
-    inet_telnum.sin_family = AF_INET;
-    inet_telnum.sin_port = htons((u_short) PORT);
-    if (bind(inet_sock, (struct sockaddr *)&inet_telnum, sizeof(struct sockaddr_in)) == -1)
-    {
-        perror("inet_sock bind failed");
-        exit(2);
-    }
-    listen(inet_sock,5);
-    printf("Listening on port %d...(pid: %d)\n",PORT,getpid());
-}    
+ 
     switch(node_id)
     {
         case 0:
-            printf("Node Controller 0 accepting connections!\n");
+            //set up socket listening
+            if ((inet_sock=socket(AF_INET,SOCK_STREAM, 0)) == -1)
+            {
+                perror("inet_sock allocation failed");
+                exit(1);
+            }
+            bcopy(&wild_card,&inet_telnum.sin_addr, sizeof(int));
+            inet_telnum.sin_family = AF_INET;
+            inet_telnum.sin_port = htons((u_short) PORT);
+            if (bind(inet_sock, (struct sockaddr *)&inet_telnum, sizeof(struct sockaddr_in)) == -1)
+            {
+                perror("inet_sock bind failed");
+                exit(2);
+            }
+            listen(inet_sock,5);
+            printf("Listening on port %d...(pid: %d)\n",PORT,getpid());
+            //accept connection 0
             while ((socket_list[0] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
             if (socket_list[0] == -1)
             {
@@ -76,38 +75,69 @@ if (node_id == 0){
                 exit(2);
             }
             printf("new_sock: %d inet_sock: %d\n",socket_list[0],inet_sock);
-            //close(inet_sock);
+            //accept connection 1
             while ((socket_list[1] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
             if (socket_list[1] == -1)
             {
                 perror("accept failed");
                 exit(2);
             }
-            printf("new_sock: %d inet_sock: %d\n",socket_list[0],inet_sock);
-            //close(inet_sock);
+            printf("new_sock: %d inet_sock: %d\n",socket_list[1],inet_sock);
+            //accept connection 2
             while ((socket_list[2] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
             if (socket_list[2] == -1)
             {
                 perror("accept failed");
                 exit(2);
             }
-            printf("new_sock: %d inet_sock: %d\n",socket_list[0],inet_sock);
+            printf("new_sock: %d inet_sock: %d\n",socket_list[2],inet_sock);
             close(inet_sock);
             break;
         case 1:
- //           socket_list[0] = node_accept(1,2);
- //           socket_list[1] = node_accept(1,3);
-            socket_list[2] = node_connect(1,0);
+            //connect to node 0
+            socket_list[0] = node_connect(1,0,argv[2]);
+            if ((inet_sock=socket(AF_INET,SOCK_STREAM, 0)) == -1)
+            {
+                perror("inet_sock allocation failed");
+                exit(1);
+            }
+            bcopy(&wild_card,&inet_telnum.sin_addr, sizeof(int));
+            inet_telnum.sin_family = AF_INET;
+            inet_telnum.sin_port = htons((u_short) PORT);
+            if (bind(inet_sock, (struct sockaddr *)&inet_telnum, sizeof(struct sockaddr_in)) == -1)
+            {
+                perror("inet_sock bind failed");
+                exit(2);
+            }
+            listen(inet_sock,5);
+            //accept connection 1
+            printf("Listening on port %d...(pid: %d)\n",PORT,getpid());
+            while ((socket_list[1] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
+            if (socket_list[1] == -1)
+            {
+                perror("accept failed");
+                exit(2);
+            }
+            printf("new_sock: %d inet_sock: %d\n",socket_list[1],inet_sock);
+            //accept connection 2
+            while ((socket_list[2] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
+            if (socket_list[2] == -1)
+            {
+                perror("accept failed");
+                exit(2);
+            }
+            printf("new_sock: %d inet_sock: %d\n",socket_list[2],inet_sock);
+            close(inet_sock);
             break;
         case 2:
    //         socket_list[0] = node_accept(2,3);
-            socket_list[1] = node_connect(2,0);
-            socket_list[2] = node_connect(2,1);
+   //         socket_list[1] = node_connect(2,0);
+   //         socket_list[2] = node_connect(2,1);
             break;
         case 3:
-            socket_list[0] = node_connect(3,1);
-            socket_list[1] = node_connect(3,3);
-            socket_list[2] = node_connect(3,4);
+   //         socket_list[0] = node_connect(3,1);
+    //        socket_list[1] = node_connect(3,3);
+    //        socket_list[2] = node_connect(3,4);
             break;
         default:
             printf("Unknown Node ID: %d\n",node_id);
@@ -118,7 +148,7 @@ if (node_id == 0){
     while(1);
 }
 
-int node_connect(int node_id,int node_id_to_connect)
+int node_connect(int node_id,int node_id_to_connect,char * IP)
 {
     MSG msg;
     MBUF raw;
@@ -128,7 +158,6 @@ int node_connect(int node_id,int node_id_to_connect)
     union type_size;
     struct sockaddr_in inet_telnum;
     struct hostent * heptr, * gethostbyname();
-    char * IP = "127.0.0.1";
     if((inet_sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
         perror("inet_sock allocation failed");
