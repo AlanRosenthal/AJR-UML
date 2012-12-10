@@ -19,6 +19,11 @@
 #define NC_PORT 4844
 #define BM_PORT 4845
 
+#define NODE1_IP "127.0.0.1"
+#define NODE2_IP "127.0.0.1"
+#define NODE3_IP "127.0.0.1"
+#define NODE4_IP "127.0.0.1"
+
 #define PRODUCE 1
 #define PRODUCEACK 101
 #define PRODUCENACK 201
