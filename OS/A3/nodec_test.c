@@ -32,28 +32,26 @@ int main(int argc, char * argv[])
         perror("inet_sock connect failed: ");
         exit(2);
     }
-    printf("Enter Command ID: ");
-    scanf("%d",&command_id);
-    printf("Enter message: ");
-    scanf("%s",msg.mbody);
-    make_header(&msg, command_id);
-    printf("ID\tSize\tMessage\n%d\t%d\t%s\n",ntohl(msg.mtype),ntohl(msg.msize),msg.mbody);
-    if (write(inet_sock,&msg,MSG_SIZE) == -1)
-    {
-        exit(3);
-    }
-    printf("Message Sent?...\n");
-    while(1);
     while(1)
     {
-        read_header(inet_sock,&raw.buf);
+        printf("Enter Command ID: ");
+        scanf("%d",&command_id);
+        printf("Enter message: ");
+        scanf("%s",msg.mbody);
+        make_header(&msg, command_id);
+        if (write(inet_sock,&msg,MSG_SIZE) == -1)
+        {
+            exit(3);
+        }
+        printf("Message Sent...\n");
+        converge_read(inet_sock,raw.buf);
+        //read_header(inet_sock,&raw.buf);
         type_val = ntohl(raw.m.mtype);
         size_val = ntohl(raw.m.msize);
         switch(type_val)
         {
             default:
-                converge_read(inet_sock,raw.buf,size_val);
-                printf("ID: %d, Size: %d, MSG: %s",type_val,size_val,raw.buf);
+                printf("ID: %d, Size: %d, MSG: %s\n",type_val,size_val,raw.m.mbody);
                 break;
         }
     }

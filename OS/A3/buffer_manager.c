@@ -57,7 +57,7 @@ int main(int argc, char * argv[])
         perror("inet_sock bind failed: ");
         exit(2);
     }
-
+    
     for (i = 0; i < NUMFLAVORS; i++)
     {
         shared_ring->outptr[i] = 0;
@@ -128,7 +128,7 @@ int main(int argc, char * argv[])
                                     exit(3);
                                 }
                             }
-                    printf("\t\tType 0\tType 1\tType 2\tType 3\nDonut Counter\t%d\t%d\t%d\t%d\n",shared_ring->donut_counter[0],shared_ring->donut_counter[1],shared_ring->donut_counter[2],shared_ring->donut_counter[3]);
+                            printf("\t\tType 0\tType 1\tType 2\tType 3\nDonut Counter\t%d\t%d\t%d\t%d\n",shared_ring->donut_counter[0],shared_ring->donut_counter[1],shared_ring->donut_counter[2],shared_ring->donut_counter[3]);
                             break;
                         case CONSUME:
                             converge_read(new_sock,raw.buf,size_val);
@@ -153,9 +153,9 @@ int main(int argc, char * argv[])
                                     exit(3);
                                 }
                             }
-                    printf("\t\tType 0\tType 1\tType 2\tType 3\nDonut Counter\t%d\t%d\t%d\t%d\n",shared_ring->donut_counter[0],shared_ring->donut_counter[1],shared_ring->donut_counter[2],shared_ring->donut_counter[3]);
+                            printf("\t\tType 0\tType 1\tType 2\tType 3\nDonut Counter\t%d\t%d\t%d\t%d\n",shared_ring->donut_counter[0],shared_ring->donut_counter[1],shared_ring->donut_counter[2],shared_ring->donut_counter[3]);
                             break;
-                        
+                            
                         default:
                             converge_read(new_sock,raw.buf,size_val);
                             printf("msg id: %d\n",type_val);

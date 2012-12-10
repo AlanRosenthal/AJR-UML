@@ -13,11 +13,11 @@ void read_header(int socket, char * buffer)
     {
         while (temp = read(socket,buffer+i, 1) == 0)
         {
-	    usleep(1000);
+            usleep(1000);
         }
         if (temp != 1)
         {
-	    printf("temp: %d\n",temp);
+            printf("temp: %d\n",temp);
             perror("read_type_size failed: ");
             exit(3);
         }
@@ -40,7 +40,7 @@ void converge_read(int socket, char * buffer)
                 perror("inet_sock read failed: ");
                 exit(3);
             case 0:
-		usleep(1000);
+                usleep(1000);
         }
     }
 }

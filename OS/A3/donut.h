@@ -49,14 +49,14 @@ typedef struct {
     int node_id[NUMSLOTS];
     int serial[NUMSLOTS];
 } donuts_t;
- 
+
 
 typedef struct {
-   donuts_t donuts[NUMFLAVORS];
-   int outptr[NUMFLAVORS];
-   int in_ptr[NUMFLAVORS];
-   int donut_counter[NUMFLAVORS];
-   int space_counter[NUMFLAVORS];
+    donuts_t donuts[NUMFLAVORS];
+    int outptr[NUMFLAVORS];
+    int in_ptr[NUMFLAVORS];
+    int donut_counter[NUMFLAVORS];
+    int space_counter[NUMFLAVORS];
 } donut_ring;
 
 

@@ -1,12 +1,6 @@
 #include "donut.h"
 
-//Node 1 Connects to Node 2, 3, 4
-//Node 2 Connects to Node 3, 4
-//Node 3 Connects to Node 4
-
-//Node 2 Accepts from Node 1
-//Node 3 Accepts from Node 1, 2
-//Node 4 Accepts from Node 1, 2, 3
+int test = 0;
 
 void child_handler(int signum)
 {
@@ -41,8 +35,8 @@ int main(int argc, char * argv[])
         perror("inet_sock allocation failed: ");
         exit(1);
     }
-
-
+    
+    
     bcopy(&wild_card,&inet_telnum.sin_addr, sizeof(int));
     inet_telnum.sin_family = AF_INET;
     //TODO: change PORT back to NC_PORT (testing on local machine)
@@ -63,6 +57,7 @@ int main(int argc, char * argv[])
             perror("accept failed: ");
             exit(2);
         }
+        printf("PID\tID\tSize\tMessage\n");
         switch (fork())
         {
             default:
@@ -74,7 +69,6 @@ int main(int argc, char * argv[])
                 exit(1);
                 
             case 0:
-                printf("new connection...(pid: %d, parent pid: %d)\n",getpid(),getppid());
                 close(inet_sock);
                 while(1)
                 {
@@ -84,12 +78,12 @@ int main(int argc, char * argv[])
                     switch (type_val)
                     {
                         default:
-                            printf("msg id: %d, msg size %d, raw msg: %s\n",type_val,size_val,raw.m.mbody);
-                            strcpy(msg.mbody,"Node Controller test");
+                            printf("%d\t%d\t%d\t%s\n",getpid(),type_val,size_val,raw.m.mbody);
+                            sprintf(msg.mbody,"Node Controller Test %d",test++);
                             make_header(&msg, NC_TEST);
                             if (write(new_sock,&msg,MSG_SIZE) == -1)
-		            {
-		                perror("new_sock write failed: ");
+                            {
+                                perror("new_sock write failed: ");
                                 exit(3);
                             }
                             break;
