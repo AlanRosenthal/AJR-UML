@@ -18,13 +18,13 @@ void read_header(int socket, char * buffer)
         if (temp != 1)
         {
             printf("temp: %d\n",temp);
-            perror("read_type_size failed: ");
+            perror("read_type_size failed");
             exit(3);
         }
     }
 }
 
-void converge_read(int socket, char * buffer)
+int converge_read(int socket, char * buffer)
 {
     int num_bytes = MSG_SIZE;
     int j;
@@ -37,11 +37,12 @@ void converge_read(int socket, char * buffer)
                 buffer += j;
                 break;
             case -1:
-                perror("inet_sock read failed: ");
+                perror("inet_sock read failed");
                 exit(3);
             case 0:
-                usleep(1000);
+                return -1;
         }
     }
+    return 0;
 }
 

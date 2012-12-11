@@ -5,7 +5,6 @@ int node_connect(int node_id,int node_id_to_connect,char * IP);
 void sig_handler(int sig);
 
 int test = 0;
-int PORT = 4844;
 
 int main(int argc, char * argv[])
 {
@@ -55,7 +54,7 @@ int main(int argc, char * argv[])
     }
     bcopy(&wild_card,&inet_telnum.sin_addr, sizeof(int));
     inet_telnum.sin_family = AF_INET;
-    inet_telnum.sin_port = htons((u_short) PORT);
+    inet_telnum.sin_port = htons((u_short) NC_PORT);
     if (bind(inet_sock, (struct sockaddr *)&inet_telnum, sizeof(struct sockaddr_in)) == -1)
     {
         perror("inet_sock bind failed");
@@ -149,16 +148,18 @@ int main(int argc, char * argv[])
             exit(3);
         }
     }
-    for(i = 0;i<3;i++)
-    {   
-        converge_read(socket_list[i],raw.buf);
+    printf("Socket\tID\tSize\tMSG\n");
+    for (i = 0;1;i = (i+1)%3)
+    {
+        if (converge_read(socket_list[i],raw.buf) == -1)
+            continue;
         //read_header(inet_sock,&raw.buf);
         type_val = ntohl(raw.m.mtype);
         size_val = ntohl(raw.m.msize);
         switch(type_val)
         {
             default:
-                printf("Socket: %d\tID: %d\tSize: %d\tMSG: %s\n",i,type_val,size_val,raw.m.mbody);
+                printf("%d\t%d\t%d\t%s\n",i,type_val,size_val,raw.m.mbody);
                 break;
         }
         
@@ -167,12 +168,7 @@ int main(int argc, char * argv[])
 
 int node_connect(int node_id,int node_id_to_connect,char * IP)
 {
-    MSG msg;
-    MBUF raw;
     int inet_sock;
-    int type_val, size_val, local_size;
-    int command_id;
-    union type_size;
     struct sockaddr_in inet_telnum;
     struct hostent * heptr, * gethostbyname();
     if((inet_sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -187,13 +183,15 @@ int node_connect(int node_id,int node_id_to_connect,char * IP)
     }
     bcopy(heptr->h_addr, &inet_telnum.sin_addr, heptr->h_length);
     inet_telnum.sin_family = AF_INET;
-    inet_telnum.sin_port = htons((u_short)PORT);
+    inet_telnum.sin_port = htons((u_short)NC_PORT);
     if (connect(inet_sock, (struct sockaddr *)&inet_telnum,sizeof(struct sockaddr_in)) == -1)
     {
         perror("inet_sock connect failed");
         exit(2);
     }
     return inet_sock;
+}
+/*
     while(1)
     {
         printf("Enter Command ID: ");
@@ -218,7 +216,7 @@ int node_connect(int node_id,int node_id_to_connect,char * IP)
         }
     }
     printf("closing...\n");
-}
+}*/
 
 void sig_handler(int sig)
 {
