@@ -50,7 +50,8 @@
                       (error "Invalid Number of Params for app")))
               (if (and (> (length sexp) 1) (symbol? (second sexp)))
                   (FWAE::id (second sexp))
-                  (error "Unknown Initial Symbol")))])])))
+                  (error "Unknown Initial Symbol")))])]
+      [(error "Unexpected Error")])))
 
 
 (test/exn (FWAE::parse '{fun 1}) "Invalid Number of Parmas for fun")
