@@ -79,12 +79,29 @@
 (test/exn (FAE::parse '{{fun {'x 'y 'z} {+ 'x 'y}} {} {}}) "Invalid Number of Params for app")
 
 
-
 ;; (FAE->sexp a-fae) -> list?
 ;; a-fwae : FAE?
 (define FAE->sexp
   (lambda (a-fae)
-    '()))
+    (type-case FAE a-fae
+      [FAE::num (n)
+                n]
+      [FAE::id (n)
+               (string->symbol (symbol->string n))]
+      [FAE::add (l r)
+                (list '+ (FAE->sexp l) (FAE->sexp r))]
+      [FAE::fun (p b)
+                (list 'fun (map string->symbol (map symbol->string p)) (FAE->sexp b))]
+      [FAE::app (f arg)
+                (list (FAE->sexp f) (map FAE->sexp arg))])))
+(test (FAE->sexp (FAE::parse 3)) 3)
+(test (FAE->sexp (FAE::parse 'x)) 'x)
+(test (FAE->sexp (FAE::parse '{+ 'x 'y})) '(+ x y))
+(test (FAE->sexp (FAE::parse '{fun {'x 'y} {+ 'x 'y}})) '(fun (x y) (+ x y)))
+(test (FAE->sexp (FAE::parse '{{fun {'x 'y} {+ 'x 'y}} {{+ 3 2} {+ 3 3}}}))
+      '((fun (x y) (+ x y)) ((+ 3 2) (+ 3 3))))
+
+
 
 ;; (duplicate-params? a-fae) -> boolean?
 ;; a-fae : FAE?
