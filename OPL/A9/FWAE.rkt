@@ -41,21 +41,18 @@
           (if (equal? (length sexp) 3)
               (FWAE::fun (map FWAE::parseFun (second sexp)) (FWAE::parse (third sexp)))
               (error "Invalid Number of Parmas for fun"))]
-         [(app)
-          (if (equal? (length sexp) 3)
-              (if (not (empty? (third sexp)))
-                  (FWAE::app (FWAE::parse (second sexp)) (map FWAE::parse (third sexp)))
-                  (error "Empty list for expr"))
-              (error "Invalid Number of Parmas for app"))]
-         
          [else
-          (if (and (> (length sexp) 1) (symbol? (second sexp)))
-              (FWAE::id (second sexp))
-              (error "Unknown Initial Symbol"))])])))
+          (if (and (FWAE::fun? (FWAE::parse (first sexp))))
+              (if (and (equal? (length sexp) 2) (not (empty? (second sexp))))
+                  (FWAE::app (FWAE::parse (first sexp)) (map FWAE::parse (second sexp)))
+                  (if (equal? (length sexp) 2)
+                      (error "Empty list for expr")
+                      (error "Invalid Number of Params for app")))
+              (if (and (> (length sexp) 1) (symbol? (second sexp)))
+                  (FWAE::id (second sexp))
+                  (error "Unknown Initial Symbol")))])])))
 
-(test/exn (FWAE::parse '{app {fun {'x} {+ 'x 'x}} {}}) "Empty list for expr")
-(test/exn (FWAE::parse '{app {fun {'x}}}) "Invalid Number of Parmas for app")
-(test/exn (FWAE::parse '{app {fun {'x}} {'x} {'x}}) "Invalid Number of Parmas for app")
+
 (test/exn (FWAE::parse '{fun 1}) "Invalid Number of Parmas for fun")
 (test/exn (FWAE::parse '{fun 1 2 3}) "Invalid Number of Parmas for fun")
 (test (FWAE::id 'x) (FWAE::parse 'x)) 
@@ -92,10 +89,12 @@
 (test (FWAE::parse '{fun {'x 'y 'z} {+ 'x 'y}}) (FWAE::fun '(x y z) (FWAE::add (FWAE::id 'x) (FWAE::id 'y))))
 (test/exn (FWAE::parse '{fun {'x 2 'z} {+ 'x 'y}}) "First term must be a symbol/Invalid number of Params")
 (test/exn (FWAE::parse '{fun {{'x 'y 'z}} {+ 'x 'y}}) "First term must be a symbol/Invalid number of Params")
-(test (FWAE::parse '{app {fun {'x} {+ 'x 'x}} {2 3 4}})
+(test (FWAE::parse '{{fun {'x} {+ 'x 'x}} {2 3 4}})
       (FWAE::app (FWAE::fun '(x) (FWAE::add (FWAE::id 'x) (FWAE::id 'x)))
                  (list (FWAE::num 2) (FWAE::num 3) (FWAE::num 4))))
-
+(test/exn (FWAE::parse '{{fun {'x} {+ 'x 'x}} {}}) "Empty list for expr")
+(test/exn (FWAE::parse '{{fun {'x} {+ 'x 'x}}}) "Invalid Number of Params for app")
+(test/exn (FWAE::parse '{{fun {'x} {+ 'x 'x}} {'x} {'x}}) "Invalid Number of Params for app")
 ;; (FWAE->sexp a-fwae) -> list?
 ;; a-fwae : FWAE?
 (define FWAE->sexp
@@ -112,14 +111,14 @@
       [FWAE::fun (params body)
                  (list 'fun (map string->symbol (map symbol->string params)) (FWAE->sexp body))]
       [FWAE::app (f e)
-                 (list 'app (FWAE->sexp f) (map FWAE->sexp e))])))
+                 (list (FWAE->sexp f) (map FWAE->sexp e))])))
 
 (define FWAE::with->sexp
   (lambda (a-fwae)
     (list (binding-id a-fwae) (FWAE->sexp (binding-named-expr a-fwae)))))
 
-(test (FWAE->sexp (FWAE::parse '{app {fun {'x} {+ 'x 3}} {3 4 5}}))
-      '(app (fun (x) (+ x 3)) (3 4 5)))
+(test (FWAE->sexp (FWAE::parse '{{fun {'x} {+ 'x 3}} {3 4 5}}))
+      '((fun (x) (+ x 3)) (3 4 5)))
 (test (FWAE->sexp (FWAE::parse '{fun {'x} {+ 'x 3}}))
       '(fun (x) (+ x 3)))
 (test (FWAE->sexp (FWAE::parse '{fun {'x 'y 'z} {+ 'x 3}}))
