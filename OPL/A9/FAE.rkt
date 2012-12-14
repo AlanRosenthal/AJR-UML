@@ -78,7 +78,6 @@
 (test/exn (FAE::parse '{{fun {'x 'y 'z} {+ 'x 'y}} {}}) "Empty list for expr")
 (test/exn (FAE::parse '{{fun {'x 'y 'z} {+ 'x 'y}} {} {}}) "Invalid Number of Params for app")
 
-
 ;; (FAE->sexp a-fae) -> list?
 ;; a-fwae : FAE?
 (define FAE->sexp
@@ -101,13 +100,33 @@
 (test (FAE->sexp (FAE::parse '{{fun {'x 'y} {+ 'x 'y}} {{+ 3 2} {+ 3 3}}}))
       '((fun (x y) (+ x y)) ((+ 3 2) (+ 3 3))))
 
-
+;; (not-duplicate-params? a-fae) -> boolean?
+;; a-fae : FAE?
+(define not-duplicate-params?
+  (lambda (a-fae)
+    (type-case FAE a-fae
+      [FAE::num (n) #t]
+      [FAE::id (n) #t]
+      [FAE::add (l r)
+                (and (not-duplicate-params? l) (not-duplicate-params? r))]
+      [FAE::fun (p body)
+                (and (equal? (set-count (list->set p)) (length p)) (not-duplicate-params? body))]
+      [FAE::app (e arg)
+                (not-duplicate-params? e)])))
 
 ;; (duplicate-params? a-fae) -> boolean?
 ;; a-fae : FAE?
 (define duplicate-params?
   (lambda (a-fae)
-    #t))
+    (not (not-duplicate-params? a-fae))))
+
+(test (duplicate-params? (FAE::parse 3)) #f)
+(test (duplicate-params? (FAE::parse 'x)) #f)
+(test (duplicate-params? (FAE::parse '{+ 'x 'x})) #f)
+(test (duplicate-params? (FAE::parse '{fun {'x 'y} {+ 'x 'y}})) #f)
+(test (duplicate-params? (FAE::parse '{fun {'x 'x} {+ 'x 'y}})) #t)
+(test (duplicate-params? (FAE::parse '{{fun {'y 'x} {+ 'x 'y}} {1 1}})) #f)
+(test (duplicate-params? (FAE::parse '{fun {'x 'y} {+ 'x {fun {'x 'y} {+ 'x 'y}}}})) #f)
 
 ;; (interp a-fae env) -> FAE-Value
 ;; a-fae : FAE?
