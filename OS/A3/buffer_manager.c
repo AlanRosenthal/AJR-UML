@@ -1,5 +1,131 @@
-#include "node_c.h"
+#include "donut.h"
 
+void sig_handler(int sig);
+
+// ./BM
+int main(int argc, char * argv[])
+{
+    int i,j,k;//counters
+    int socket_list[4];
+    printf("Starting Buffer Manager...\n");
+    //Signal catching 
+    sigset_t mask_sigs;
+    int nsigs;
+    struct sigaction new_action;
+    int sigs[] = {SIGHUP,SIGINT,SIGQUIT,SIGBUS,SIGTERM,SIGSEGV,SIGFPE};
+    nsigs = sizeof(sigs)/sizeof(int);
+    sigemptyset(&mask_sigs);
+    for (i = 0; i< nsigs ; i++)
+    {
+        sigaddset(&mask_sigs,sigs[i]);
+    }
+    for (i = 0; i < nsigs; i++)
+    {
+        new_action.sa_handler = sig_handler;
+        new_action.sa_mask = mask_sigs;
+        new_action.sa_flags = 0;
+        
+        if (sigaction (sigs[i],&new_action,NULL) == -1)
+        {
+            perror("can't set signals: ");
+            exit(1);
+        }
+    }
+    //socket setup
+    int inet_sock;
+    int new_sock;
+    int wild_card = INADDR_ANY;    
+    int type_val;
+    int size_val;
+    struct sockaddr_in inet_telnum;
+    struct hostent *heptr, *gethostbyname();
+    socklen_t fromlen = sizeof(struct sockaddr);
+    MSG msg;
+    MBUF raw;
+    //set up socket listening
+    if ((inet_sock=socket(AF_INET,SOCK_STREAM, 0)) == -1)
+    {
+        perror("inet_sock allocation failed");
+        exit(1);
+    }
+    bcopy(&wild_card,&inet_telnum.sin_addr, sizeof(int));
+    inet_telnum.sin_family = AF_INET;
+    inet_telnum.sin_port = htons((u_short) BM_PORT);
+    if (bind(inet_sock, (struct sockaddr *)&inet_telnum, sizeof(struct sockaddr_in)) == -1)
+    {
+        perror("inet_sock bind failed");
+        exit(2);
+    }
+    listen(inet_sock,5);
+    //connect to nodes in network
+    printf("Connecting to network...\n");
+    //accept connection from node 1
+    while ((socket_list[0] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
+    if (socket_list[0] == -1)
+    {
+        perror("accept failed");
+        exit(2);
+    }
+    //accept connection from node 2
+    while ((socket_list[1] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
+    if (socket_list[1] == -1)
+    {
+        perror("accept failed");
+        exit(2);
+    }
+    //accept connection from node 3
+    while ((socket_list[2] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
+    if (socket_list[2] == -1)
+    {
+        perror("accept failed");
+        exit(2);
+    }
+    //accept connection from node 4
+    while ((socket_list[3] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
+    if (socket_list[3] == -1)
+    {
+        perror("accept failed");
+        exit(2);
+    }
+    close(inet_sock);
+    printf("Connected!\n");
+    sprintf(msg.mbody,"Hello World %d",100);
+    make_header(&msg, 102);
+    for (i = 0;i < 4;i++)
+    {
+        if (write(socket_list[i],&msg,MSG_SIZE) == -1)
+        {
+            printf("Error writing to socket\n");
+            perror("write to socket");
+            exit(3);
+        }
+    }
+    printf("Socket\tID\tSize\tMSG\n");
+    for (i = 0;1;i = (i+1)%4)
+    {
+        if (converge_read(socket_list[i],raw.buf) == -1)
+            continue;
+        //read_header(inet_sock,&raw.buf);
+        type_val = ntohl(raw.m.mtype);
+        size_val = ntohl(raw.m.msize);
+        switch(type_val)
+        {
+            default:
+                printf("%d\t%d\t%d\t%s\n",i,type_val,size_val,raw.m.mbody);
+                break;
+        }
+        
+    }    
+}
+
+void sig_handler(int sig)
+{
+    printf("In signal hanlder with signal # %d\n", sig);
+    exit(5);
+}
+
+
+/*
 int shmid;
 
 void child_handler(int signum)
@@ -81,7 +207,32 @@ int main(int argc, char * argv[])
         {
             default:
                 close(new_sock);
-                break;
+           
+int node_connect(int node_id,int node_id_to_connect,char * IP)
+{
+    int inet_sock;
+    struct sockaddr_in inet_telnum;
+    struct hostent * heptr, * gethostbyname();
+    if((inet_sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    {
+        perror("inet_sock allocation failed");
+        exit(1);
+    }
+    if ((heptr = gethostbyname(IP)) == NULL)
+    {
+        perror("gethostbyname failed");
+        exit(1);
+    }
+    bcopy(heptr->h_addr, &inet_telnum.sin_addr, heptr->h_length);
+    inet_telnum.sin_family = AF_INET;
+    inet_telnum.sin_port = htons((u_short)NC_PORT);
+    if (connect(inet_sock, (struct sockaddr *)&inet_telnum,sizeof(struct sockaddr_in)) == -1)
+    {
+        perror("inet_sock connect failed");
+        exit(2);
+    }
+    return inet_sock;
+}     break;
                 
             case -1:
                 perror("fork failed: ");
@@ -176,3 +327,4 @@ int main(int argc, char * argv[])
         }
     }
 }
+*/

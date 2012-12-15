@@ -1,17 +1,20 @@
 #include "donut.h"
 
-//int node_accept(int node_id,int node_id_to_connect);
-int node_connect(int node_id,int node_id_to_connect,char * IP);
+int node_connect(char * IP,int PORT);
 void sig_handler(int sig);
-
-int test = 0;
 
 int main(int argc, char * argv[])
 {
     int i,j,k;//counters
     int node_id = atoi(argv[1]);
-    int socket_list[3];
-    printf("Starting Node Controller %d...\n",node_id);
+    int socket_list[4];
+    if (argc != 7)
+    {
+        printf("./nodec [node_id] [node 0 IP] [node 1 IP] [node 2 IP] [node 3 IP] [BM IP]\n");
+        error(-1);
+    }
+    printf("Starting Node Controller %d...\n",node_id,argc);
+    
     //Signal catching 
     sigset_t mask_sigs;
     int nsigs;
@@ -88,10 +91,12 @@ int main(int argc, char * argv[])
                 exit(2);
             }
             close(inet_sock);
+            //connect to BM
+            socket_list[3] = node_connect(argv[6],BM_PORT);
             break;
         case 1:
             //connect to node 0
-            socket_list[0] = node_connect(1,0,argv[2]);
+            socket_list[0] = node_connect(argv[2],NC_PORT);
             //accept connection from node 2
             while ((socket_list[1] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
             if (socket_list[1] == -1)
@@ -107,12 +112,14 @@ int main(int argc, char * argv[])
                 exit(2);
             }
             close(inet_sock);
+            //connect to BM
+            socket_list[3] = node_connect(argv[6],BM_PORT);
             break;
         case 2:
             //connect to node 0
-            socket_list[0] = node_connect(2,0,argv[2]);
+            socket_list[0] = node_connect(argv[2],NC_PORT);
             //connect to node 1
-            socket_list[1] = node_connect(2,1,argv[3]);
+            socket_list[1] = node_connect(argv[3],NC_PORT);
             //accept connection from node 3
             while ((socket_list[2] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
             if (socket_list[2] == -1)
@@ -121,15 +128,19 @@ int main(int argc, char * argv[])
                 exit(2);
             }
             close(inet_sock);
+            //connect to BM
+            socket_list[3] = node_connect(argv[6],BM_PORT);
             break;
         case 3:
             close(inet_sock);
             //connect to node 0
-            socket_list[0] = node_connect(3,0,argv[2]);
+            socket_list[0] = node_connect(argv[2],NC_PORT);
             //connect to node 1
-            socket_list[1] = node_connect(3,1,argv[3]);
+            socket_list[1] = node_connect(argv[3],NC_PORT);
             //connect to node 2
-            socket_list[2] = node_connect(3,2,argv[4]);
+            socket_list[2] = node_connect(argv[4],NC_PORT);
+            //connect to BM
+            socket_list[3] = node_connect(argv[6],BM_PORT);
             break;
         default:
             printf("Unknown Node ID: %d\n",node_id);
@@ -139,7 +150,7 @@ int main(int argc, char * argv[])
     printf("Connected!\n");
     sprintf(msg.mbody,"Hello World %d",node_id);
     make_header(&msg, 101);
-    for (i = 0;i < 3;i++)
+    for (i = 0;i < 4;i++)
     {
         if (write(socket_list[i],&msg,MSG_SIZE) == -1)
         {
@@ -149,7 +160,7 @@ int main(int argc, char * argv[])
         }
     }
     printf("Socket\tID\tSize\tMSG\n");
-    for (i = 0;1;i = (i+1)%3)
+    for (i = 0;1;i = (i+1)%4)
     {
         if (converge_read(socket_list[i],raw.buf) == -1)
             continue;
@@ -166,7 +177,7 @@ int main(int argc, char * argv[])
     }    
 }
 
-int node_connect(int node_id,int node_id_to_connect,char * IP)
+int node_connect(char * IP,int PORT)
 {
     int inet_sock;
     struct sockaddr_in inet_telnum;
@@ -183,7 +194,7 @@ int node_connect(int node_id,int node_id_to_connect,char * IP)
     }
     bcopy(heptr->h_addr, &inet_telnum.sin_addr, heptr->h_length);
     inet_telnum.sin_family = AF_INET;
-    inet_telnum.sin_port = htons((u_short)NC_PORT);
+    inet_telnum.sin_port = htons((u_short)PORT);
     if (connect(inet_sock, (struct sockaddr *)&inet_telnum,sizeof(struct sockaddr_in)) == -1)
     {
         perror("inet_sock connect failed");
