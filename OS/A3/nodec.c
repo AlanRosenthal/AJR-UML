@@ -10,11 +10,10 @@ int main(int argc, char * argv[])
     int socket_list[4];
     if (argc != 7)
     {
-        printf("./nodec [node_id] [node 0 IP] [node 1 IP] [node 2 IP] [node 3 IP] [BM IP]\n");
-        error(-1);
+        printf("./nodec [node_id] [BM IP] [node 0 IP] [node 1 IP] [node 2 IP] [node 3 IP]\n");
+        error(1);
     }
     printf("Starting Node Controller %d...\n",node_id,argc);
-    
     //Signal catching 
     sigset_t mask_sigs;
     int nsigs;
@@ -92,11 +91,11 @@ int main(int argc, char * argv[])
             }
             close(inet_sock);
             //connect to BM
-            socket_list[3] = node_connect(argv[6],BM_PORT);
+            socket_list[3] = node_connect(argv[2],BM_PORT);
             break;
         case 1:
             //connect to node 0
-            socket_list[0] = node_connect(argv[2],NC_PORT);
+            socket_list[0] = node_connect(argv[3],NC_PORT);
             //accept connection from node 2
             while ((socket_list[1] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
             if (socket_list[1] == -1)
@@ -113,13 +112,13 @@ int main(int argc, char * argv[])
             }
             close(inet_sock);
             //connect to BM
-            socket_list[3] = node_connect(argv[6],BM_PORT);
+            socket_list[3] = node_connect(argv[2],BM_PORT);
             break;
         case 2:
             //connect to node 0
-            socket_list[0] = node_connect(argv[2],NC_PORT);
+            socket_list[0] = node_connect(argv[3],NC_PORT);
             //connect to node 1
-            socket_list[1] = node_connect(argv[3],NC_PORT);
+            socket_list[1] = node_connect(argv[4],NC_PORT);
             //accept connection from node 3
             while ((socket_list[2] = accept(inet_sock, (struct sockaddr *) &inet_telnum, &fromlen)) == -1 && errno == EINTR);
             if (socket_list[2] == -1)
@@ -129,18 +128,18 @@ int main(int argc, char * argv[])
             }
             close(inet_sock);
             //connect to BM
-            socket_list[3] = node_connect(argv[6],BM_PORT);
+            socket_list[3] = node_connect(argv[2],BM_PORT);
             break;
         case 3:
             close(inet_sock);
             //connect to node 0
-            socket_list[0] = node_connect(argv[2],NC_PORT);
+            socket_list[0] = node_connect(argv[3],NC_PORT);
             //connect to node 1
-            socket_list[1] = node_connect(argv[3],NC_PORT);
+            socket_list[1] = node_connect(argv[4],NC_PORT);
             //connect to node 2
-            socket_list[2] = node_connect(argv[4],NC_PORT);
+            socket_list[2] = node_connect(argv[5],NC_PORT);
             //connect to BM
-            socket_list[3] = node_connect(argv[6],BM_PORT);
+            socket_list[3] = node_connect(argv[2],BM_PORT);
             break;
         default:
             printf("Unknown Node ID: %d\n",node_id);

@@ -8,7 +8,6 @@ nodec: nodec.o donut_util.o
 buffer_manager: buffer_manager.o donut_util.o
 	gcc -o buffer_manager buffer_manager.o donut_util.o
 
-
 nodec.o: nodec.c donut.h
 	gcc -c nodec.c
 
