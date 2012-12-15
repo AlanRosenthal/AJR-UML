@@ -17,4 +17,4 @@ buffer_manager.o: buffer_manager.c donut.h
 donut_util.o: donut_util.c donut.h
 	gcc -c donut_util.c
 clean:
-	rm *.o nodec
+	rm *.o nodec buffer_manager
