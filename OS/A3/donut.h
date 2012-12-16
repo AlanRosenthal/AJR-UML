@@ -19,13 +19,9 @@
 #define NC_PORT 4844
 #define BM_PORT 4845
 
-#define PRODUCE 1
-#define PRODUCEACK 101
-#define PRODUCENACK 201
-#define CONSUME 2
-#define CONSUMEACK 102
-#define CONSUMENACK 202
-#define NC_TEST 300
+#define LAMPORT_REQUEST 100
+#define LAMPORT_REPLY   101
+#define LAMPORT_RELEASE 102
 
 typedef struct {
     int mtype;
@@ -37,6 +33,21 @@ typedef union {
     MSG m;
     char buf[MSG_SIZE];
 } MBUF;
+
+typedef struct {
+    int message_type;
+    int clock;
+    int node_id;
+    int previous;
+    int next;
+} LAMPORT_MESSAGE;
+
+typedef struct {
+    int clock;
+    int queue_lenght;
+    LAMPORT_MESSAGE messages[20];
+    char first;
+} LAMPORT;
 
 #define NUMFLAVORS 4
 #define NUMSLOTS 20
