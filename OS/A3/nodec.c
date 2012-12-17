@@ -5,6 +5,9 @@ void sig_handler(int sig);
 
 void lamport_send_request(MSG * msg,LAMPORT * lamport,int socket_list[]);
 void lamport_send_reply(MSG * msg,LAMPORT * lamport,int sock);
+void lamport_add_request(LAMPORT * lamport,int node_id,int clock);
+void lamport_add_reply(LAMPORT * lamport,int node_id,int clock);
+void lamport_print(LAMPORT * lamport);
 
 int main(int argc, char * argv[])
 {
@@ -171,6 +174,7 @@ int main(int argc, char * argv[])
         for (j = 0;j<3;j++)
         {
             lamport.request[i].reply[j].node_id = -1;
+            lamport.request[i].reply[j].clock = -1;
         }
         
     }
@@ -182,7 +186,8 @@ int main(int argc, char * argv[])
     if (node_id == 0)
         lamport_send_request(&msg,&lamport,socket_list);
     printf("Socket\tID\tMSG\n");
-    j = 0;
+    int rec_node_id;
+    int rec_clock;
     for (sock = 0;1;sock = (sock+1)%4)
     {
         if (converge_read(socket_list[sock],raw.buf) == -1)
@@ -193,17 +198,103 @@ int main(int argc, char * argv[])
         switch(type_val)
         {
             case MSG_LAMPORT_REQUEST:
+                sscanf(raw.m.mbody,"REQUEST node_id %d clock %d",&rec_node_id,&rec_clock);
+                lamport_add_request(&lamport,rec_node_id,rec_clock);
                 lamport_send_reply(&msg,&lamport,socket_list[sock]);
                 break;
             case MSG_LAMPORT_REPLY:
+                sscanf(raw.m.mbody,"REPLY node_id %d clock %d",&rec_node_id,&rec_clock);
+                lamport_add_reply(&lamport,rec_node_id,rec_clock);
                 //lamport_send_request(&msg,&lamport,socket_list);
                 break;
             default:
                 break;
         }
         printf("%d\t%d\t%s\n",sock,type_val,raw.m.mbody);
+        lamport_print(&lamport);
     }    
 }
+void lamport_print(LAMPORT * lamport)
+{
+    int i,j,index;
+    index = lamport->first;
+    for (i = 0;i < lamport->queue_size;i++)
+    {
+        printf("Node ID: %d, Clock: %d, Replies: ",lamport->request[index].node_id,lamport->request[index].clock);
+        for (j = 0;j < 3;j++)
+        {
+            printf("[%d/%d]",lamport->request[index].reply[j].node_id,lamport->request[index].reply[j].clock);
+        }
+        printf("\n");
+        index = lamport->request[index].next;
+        if (index == -1)
+            break;
+    }
+
+}
+void lamport_add_reply(LAMPORT * lamport,int node_id,int clock)
+{
+    int i,j,k;
+    int index = lamport->first;
+    for (i=0;i < lamport->queue_size;i++)
+    {
+        if (lamport->node_id == lamport->request[index].node_id) //reply to my request
+        {
+            k = 0;
+            for (j = 0;j<3;j++)
+            {
+                if (lamport->request[index].reply[j].node_id == node_id) //already a reply under this request 
+                {
+                    k = 1;
+                    break;//breaks out of j loop
+                }
+            }
+            if (k == 0) //no reply yet
+            {
+                //adding reply
+                for (j = 0;j<3;j++)
+                {
+                    if (lamport->request[index].reply[j].node_id == -1)
+                    {
+                        lamport->request[index].reply[j].node_id = node_id;
+                        lamport->request[index].reply[j].clock = clock;
+                        break;//breaks out of j loop
+                    }
+                }
+                break;//breaks out of i loop
+            }
+            index = lamport->request[index].next;
+            if (index == -1)
+                break;
+        }
+    }
+    //update clock in nessacary
+    if (lamport->clock <= clock)
+        lamport->clock = clock + 1;
+}
+void lamport_add_request(LAMPORT * lamport,int node_id,int clock)
+{
+    int index;
+    //add to queue
+    if (lamport->first == -1)
+    {
+        lamport->first = 0;
+        index = lamport->first;
+        lamport->request[index].clock = clock;
+        lamport->request[index].node_id = node_id;
+        lamport->request[index].next = -1;
+        lamport->request[index].previous = -1;
+        lamport->queue_size = 1;
+    }
+    else
+    {
+        //second request
+    }
+    //update clock in nessacary
+    if (lamport->clock <= clock)
+        lamport->clock = clock + 1;
+}
+
 void lamport_send_request(MSG * msg,LAMPORT * lamport,int socket_list[])
 {
     int i;
@@ -213,7 +304,7 @@ void lamport_send_request(MSG * msg,LAMPORT * lamport,int socket_list[])
     {
         send_message(msg,socket_list[i],MSG_LAMPORT_REQUEST);
     }
-    lamport->clock++;
+    lamport_add_request(lamport,lamport->node_id,lamport->clock);
 }
 void lamport_send_reply(MSG * msg,LAMPORT * lamport,int sock)
 {
