@@ -97,12 +97,12 @@ int main(int argc, char * argv[])
         }
     }
     printf("Connected!\n");
-    sprintf(msg.mbody,"HELLO_WORLD_BM");
-    for (i = 0;i < 4;i++)
-    {
-        send_message(&msg,socket_list[i],MSG_HELLO_WORLD_BM);
-    }
-    
+//     sprintf(msg.mbody,"HELLO_WORLD_BM");
+//     for (i = 0;i < 4;i++)
+//     {
+//         send_message(&msg,socket_list[i],MSG_HELLO_WORLD_BM);
+//     }
+//     
     printf("Socket\tID\tMSG\n");
     for (sock = 0;1;sock = (sock+1)%4)
     {
@@ -111,6 +111,11 @@ int main(int argc, char * argv[])
         type_val = ntohl(raw.m.mtype);
         switch(type_val)
         {
+            case TEST1:
+                sleep(1);
+                sprintf(msg.mbody,"DO CS....");
+                send_message(&msg,socket_list[sock],MSG_BM_FINSIHED_TEST);
+                break;
             default:
                 break;
         }

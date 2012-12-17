@@ -16,7 +16,7 @@
 #define MSG_BODY 248
 #define MSG_SIZE (MSG_BODY+8)
 
-#define NC_PORT 4842
+#define NC_PORT 4840
 #define BM_PORT (NC_PORT+1)
 
 #define MSG_HELLO_WORLD 1
@@ -25,6 +25,9 @@
 #define MSG_LAMPORT_REPLY   101
 #define MSG_LAMPORT_RELEASE 102
 
+#define TEST1 103
+#define TEST2 104
+#define MSG_BM_FINSIHED_TEST 105
 typedef struct {
     int mtype;
     int msize;
