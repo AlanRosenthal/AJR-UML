@@ -1,46 +1,38 @@
 #include "donut.h"
+int converge_read(int socket, char * buffer);
+void send_message(MSG * message_ptr,int socket,int type);
 
-void make_header(MSG * message_ptr, int type)
+void send_message(MSG * message_ptr,int socket,int type)
 {
     message_ptr->msize = htonl(MSG_SIZE);
     message_ptr->mtype = htonl(type);
-}
-
-void read_header(int socket, char * buffer)
-{
-    int i,temp;
-    for (i = 0; i < (2*sizeof(int)); i++)
+    if (write(socket,message_ptr,MSG_SIZE) == -1)
     {
-        while (temp = read(socket,buffer+i, 1) == 0)
-        {
-            usleep(1000);
-        }
-        if (temp != 1)
-        {
-            printf("temp: %d\n",temp);
-            perror("read_type_size failed");
-            exit(3);
-        }
+        printf("Error writing to socket\n");
+        perror("write to socket");
+        exit(3);
     }
 }
-
 int converge_read(int socket, char * buffer)
 {
     int num_bytes = MSG_SIZE;
-    int j;
+    int j = 0;
     while ((j = read(socket, buffer, num_bytes)) != num_bytes)
     {
         switch(j)
         {
-            default:
-                num_bytes -= j;
-                buffer += j;
-                break;
             case -1:
+                if(errno == EAGAIN)
+                    return -1;
                 perror("inet_sock read failed");
                 exit(3);
             case 0:
                 return -1;
+            default:
+                num_bytes -= j;
+                buffer += j;
+                break;
+            
         }
     }
     return 0;

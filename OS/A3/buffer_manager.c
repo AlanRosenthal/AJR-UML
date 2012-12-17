@@ -5,7 +5,7 @@ void sig_handler(int sig);
 // ./BM
 int main(int argc, char * argv[])
 {
-    int i,j,k;//counters
+    int i,j,k,sock;//counters
     int socket_list[4];
     printf("Starting Buffer Manager...\n");
     //Signal catching 
@@ -88,34 +88,49 @@ int main(int argc, char * argv[])
         exit(2);
     }
     close(inet_sock);
-    printf("Connected!\n");
-    sprintf(msg.mbody,"Hello World %d",100);
-    make_header(&msg, 102);
     for (i = 0;i < 4;i++)
     {
-        if (write(socket_list[i],&msg,MSG_SIZE) == -1)
+        if (fcntl(socket_list[i],F_SETFL,fcntl(socket_list[i],F_GETFL) | O_NONBLOCK))
         {
-            printf("Error writing to socket\n");
-            perror("write to socket");
-            exit(3);
+            perror("fcntl failed");
+            exit(1);
         }
     }
-    printf("Socket\tID\tSize\tMSG\n");
-    for (i = 0;1;i = (i+1)%4)
+    printf("Connected!\n");
+    sprintf(msg.mbody,"HELLO_WORLD_BM");
+    for (i = 0;i < 4;i++)
     {
-        if (converge_read(socket_list[i],raw.buf) == -1)
+        send_message(&msg,socket_list[i],MSG_HELLO_WORLD_BM);
+    }
+    
+    printf("Socket\tID\tMSG\n");
+    for (sock = 0;1;sock = (sock+1)%4)
+    {
+        if (converge_read(socket_list[sock],raw.buf) == -1)
             continue;
-        //read_header(inet_sock,&raw.buf);
         type_val = ntohl(raw.m.mtype);
-        size_val = ntohl(raw.m.msize);
         switch(type_val)
         {
             default:
-                printf("%d\t%d\t%d\t%s\n",i,type_val,size_val,raw.m.mbody);
                 break;
         }
-        
+        printf("%d\t%d\t%s\n",sock,type_val,raw.m.mbody);
     }    
+//     for (i = 0;1;i = (i+1)%4)
+//     {
+//         if (converge_read(socket_list[i],raw.buf) == -1)
+//             continue;
+//         //read_header(inet_sock,&raw.buf);
+//         type_val = ntohl(raw.m.mtype);
+//         size_val = ntohl(raw.m.msize);
+//         switch(type_val)
+//         {
+//             default:
+//                 printf("%d\t%d\t%d\t%s\n",i,type_val,size_val,raw.m.mbody);
+//                 break;
+//         }
+//         
+//     }    
 }
 
 void sig_handler(int sig)

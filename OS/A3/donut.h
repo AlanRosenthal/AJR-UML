@@ -19,9 +19,11 @@
 #define NC_PORT 4844
 #define BM_PORT 4845
 
-#define LAMPORT_REQUEST 100
-#define LAMPORT_REPLY   101
-#define LAMPORT_RELEASE 102
+#define MSG_HELLO_WORLD 1
+#define MSG_HELLO_WORLD_BM 2
+#define MSG_LAMPORT_REQUEST 100
+#define MSG_LAMPORT_REPLY   101
+#define MSG_LAMPORT_RELEASE 102
 
 typedef struct {
     int mtype;
@@ -35,18 +37,24 @@ typedef union {
 } MBUF;
 
 typedef struct {
-    int message_type;
+    int clock;
+    int node_id;
+} LAMPORT_REPLY;
+
+typedef struct {
     int clock;
     int node_id;
     int previous;
     int next;
-} LAMPORT_MESSAGE;
+    LAMPORT_REPLY reply[3];
+} LAMPORT_REQUEST;
 
 typedef struct {
     int clock;
-    int queue_lenght;
-    LAMPORT_MESSAGE messages[20];
-    char first;
+    int node_id;
+    int queue_size;
+    LAMPORT_REQUEST request[20];
+    int first;
 } LAMPORT;
 
 #define NUMFLAVORS 4

@@ -1,4 +1,7 @@
 clear
+if [ $1 == "BM" ]; then
+    rm hostfile.txt
+fi
 hostname >> hostfile.txt
 lines=0
 echo "Waiting for nodes..."

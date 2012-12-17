@@ -3,9 +3,12 @@
 int node_connect(char * IP,int PORT);
 void sig_handler(int sig);
 
+void lamport_send_request(MSG * msg,LAMPORT * lamport,int socket_list[]);
+void lamport_send_reply(MSG * msg,LAMPORT * lamport,int sock);
+
 int main(int argc, char * argv[])
 {
-    int i,j,k;//counters
+    int i,j,k,sock;//counters
     int node_id = atoi(argv[1]);
     int socket_list[4];
     if (argc != 7)
@@ -146,34 +149,77 @@ int main(int argc, char * argv[])
             exit(4);
             break;
     }
-    printf("Connected!\n");
-    sprintf(msg.mbody,"Hello World %d",node_id);
-    make_header(&msg, 101);
     for (i = 0;i < 4;i++)
     {
-        if (write(socket_list[i],&msg,MSG_SIZE) == -1)
+        if (fcntl(socket_list[i],F_SETFL,fcntl(socket_list[i],F_GETFL) | O_NONBLOCK))
         {
-            printf("Error writing to socket\n");
-            perror("write to socket");
-            exit(3);
+            perror("fcntl failed");
+            exit(1);
         }
     }
-    printf("Socket\tID\tSize\tMSG\n");
-    for (i = 0;1;i = (i+1)%4)
+    
+    printf("Connected!\n");
+    //initialize laport's algorithm
+    LAMPORT lamport;
+    lamport.clock = 0;
+    lamport.queue_size = 0;
+    lamport.first = -1;
+    lamport.node_id = node_id;
+    for (i = 0;i<20;i++)
     {
-        if (converge_read(socket_list[i],raw.buf) == -1)
-            continue;
-        //read_header(inet_sock,&raw.buf);
-        type_val = ntohl(raw.m.mtype);
-        size_val = ntohl(raw.m.msize);
-        switch(type_val)
+        lamport.request[i].node_id = -1;
+        for (j = 0;j<3;j++)
         {
-            default:
-                printf("%d\t%d\t%d\t%s\n",i,type_val,size_val,raw.m.mbody);
-                break;
+            lamport.request[i].reply[j].node_id = -1;
         }
         
+    }
+//     for (i = 0;i < 4;i++)
+//     {
+//         sprintf(msg.mbody,"HELLO_WORLD node_id %d",node_id);
+//         send_message(&msg,socket_list[i],MSG_HELLO_WORLD);
+//     }
+    if (node_id == 0)
+        lamport_send_request(&msg,&lamport,socket_list);
+    printf("Socket\tID\tMSG\n");
+    j = 0;
+    for (sock = 0;1;sock = (sock+1)%4)
+    {
+        if (converge_read(socket_list[sock],raw.buf) == -1)
+        {
+            continue;
+        }
+        type_val = ntohl(raw.m.mtype);
+        switch(type_val)
+        {
+            case MSG_LAMPORT_REQUEST:
+                lamport_send_reply(&msg,&lamport,socket_list[sock]);
+                break;
+            case MSG_LAMPORT_REPLY:
+                //lamport_send_request(&msg,&lamport,socket_list);
+                break;
+            default:
+                break;
+        }
+        printf("%d\t%d\t%s\n",sock,type_val,raw.m.mbody);
     }    
+}
+void lamport_send_request(MSG * msg,LAMPORT * lamport,int socket_list[])
+{
+    int i;
+
+    sprintf(msg->mbody,"REQUEST node_id %d clock %d",lamport->node_id,lamport->clock);
+    for (i = 0;i < 3;i++)
+    {
+        send_message(msg,socket_list[i],MSG_LAMPORT_REQUEST);
+    }
+    lamport->clock++;
+}
+void lamport_send_reply(MSG * msg,LAMPORT * lamport,int sock)
+{
+    sprintf(msg->mbody,"REPLY node_id %d clock %d",lamport->node_id,lamport->clock);
+    send_message(msg,sock,MSG_LAMPORT_REPLY);
+    lamport->clock++;
 }
 
 int node_connect(char * IP,int PORT)
