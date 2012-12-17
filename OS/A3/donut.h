@@ -17,7 +17,7 @@
 #define MSG_SIZE (MSG_BODY+8)
 
 #define NC_PORT 4844
-#define BM_PORT 4845
+#define BM_PORT 4846
 
 #define MSG_HELLO_WORLD 1
 #define MSG_HELLO_WORLD_BM 2

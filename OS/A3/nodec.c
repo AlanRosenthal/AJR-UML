@@ -212,8 +212,13 @@ int main(int argc, char * argv[])
         }
         printf("%d\t%d\t%s\n",sock,type_val,raw.m.mbody);
         lamport_print(&lamport);
+        lamport_check_cs(&lamport);
     }    
 }
+void lamport_check_cs(LAMPORT * lamport)
+{
+}
+
 void lamport_print(LAMPORT * lamport)
 {
     int i,j,index;
