@@ -16,8 +16,8 @@
 #define MSG_BODY 248
 #define MSG_SIZE (MSG_BODY+8)
 
-#define NC_PORT 4844
-#define BM_PORT 4846
+#define NC_PORT 4840
+#define BM_PORT 4841
 
 #define MSG_HELLO_WORLD 1
 #define MSG_HELLO_WORLD_BM 2
@@ -46,7 +46,7 @@ typedef struct {
     int node_id;
     int previous;
     int next;
-    LAMPORT_REPLY reply[3];
+    LAMPORT_REPLY reply[4];
 } LAMPORT_REQUEST;
 
 typedef struct {
