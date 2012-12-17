@@ -188,13 +188,7 @@ int main(int argc, char * argv[])
 //         sprintf(msg.mbody,"HELLO_WORLD node_id %d",node_id);
 //         send_message(&msg,socket_list[i],MSG_HELLO_WORLD);
 //     }
-    if (node_id == 0)
-        lamport_send_request(&msg,&lamport,socket_list);
-    if (node_id == 1)
-    {
-        sleep(1);
-        lamport_send_request(&msg,&lamport,socket_list);
-    }
+    lamport_send_request(&msg,&lamport,socket_list);
     printf("Socket\tID\tMSG\n");
     int rec_node_id;
     int rec_clock;
@@ -216,12 +210,14 @@ int main(int argc, char * argv[])
             case MSG_LAMPORT_REPLY:
                 sscanf(raw.m.mbody,"REPLY node_id %d clock %d",&rec_node_id,&rec_clock);
                 lamport_add_reply(&lamport,rec_node_id,rec_clock);
-                j++;
-                //if (j == 3) lamport_send_request(&msg,&lamport,socket_list);
                 break;
             default:
                 break;
         }
+        j++;
+        if ((j == 3) && (node_id <= 1)) lamport_send_request(&msg,&lamport,socket_list);
+        if ((j == 6) && (node_id == 2)) lamport_send_request(&msg,&lamport,socket_list);
+        if ((j == 7) && (node_id < 2)) lamport_send_request(&msg,&lamport,socket_list);
         printf("%d\t%d\t%s\n",sock,type_val,raw.m.mbody);
         lamport_print(&lamport);
         lamport_check_cs(&lamport);
@@ -237,7 +233,7 @@ void lamport_print(LAMPORT * lamport)
     index = lamport->first;
     while(1)
     {
-        printf("Node ID: %d, Clock: %2d, Replies: ",lamport->request[index].node_id,lamport->request[index].clock);
+        printf("Clock: %2d, Node ID: %d, Replies: ",lamport->request[index].clock,lamport->request[index].node_id);
         for (i = 0;i < 4;i++)
         {
             printf("[%02d/%02d]",lamport->request[index].reply[i].node_id,lamport->request[index].reply[i].clock);
@@ -303,6 +299,9 @@ void lamport_add_request(LAMPORT * lamport,int node_id,int clock)
     }
     else
     {
+//         printf("Printing Queue...\n");
+        lamport_print(lamport);
+
         //find value for index
         for (i = 0;i<20;i++)
         {
@@ -324,20 +323,24 @@ void lamport_add_request(LAMPORT * lamport,int node_id,int clock)
         lamport->request[i].previous = index;
         lamport->request[i].next = -1;
         
+//         lamport_print(lamport);
+//         printf("\n");
+//         sleep(15);
+        
         //slide it down
         while ((lamport->request[i].previous != -1) && (lamport->request[i].clock < lamport->request[lamport->request[i].previous].clock))
         {
             next = lamport->request[i].next;
             previous = lamport->request[i].previous;
             previousprevious = lamport->request[lamport->request[i].previous].previous;
-            printf("node_id:%d,clock:%d,next:%d,previous:%d,previousprevious:%d\n",node_id,clock,next,previous,previousprevious);
-            lamport_print(lamport);
+//             printf("node_id:%d,clock:%d,next:%d,previous:%d,previousprevious:%d\n",node_id,clock,next,previous,previousprevious);
+//             lamport_print(lamport);
             lamport->request[previous].previous = i;
             lamport->request[previous].next = next;
             lamport->request[i].previous = previousprevious;
             lamport->request[i].next = previous;
             lamport->request[previousprevious].next = i;
-            lamport_print(lamport);
+//             lamport_print(lamport);
         }
         while ((lamport->request[i].previous != -1) &&
             (lamport->request[i].clock == lamport->request[lamport->request[i].previous].clock) &&
@@ -346,14 +349,21 @@ void lamport_add_request(LAMPORT * lamport,int node_id,int clock)
             next = lamport->request[i].next;
             previous = lamport->request[i].previous;
             previousprevious = lamport->request[lamport->request[i].previous].previous;
-            printf("node_id:%d,clock:%d,next:%d,previous:%d,previousprevious:%d\n",node_id,clock,next,previous,previousprevious);
-            lamport_print(lamport);
+//             printf("node_id:%d,clock:%d,next:%d,previous:%d,previousprevious:%d\n",node_id,clock,next,previous,previousprevious);
+//             lamport_print(lamport);
+//             printf("\n");
             lamport->request[previous].previous = i;
             lamport->request[previous].next = next;
             lamport->request[i].previous = previousprevious;
             lamport->request[i].next = previous;
-            lamport->request[previousprevious].next = i;
-            lamport_print(lamport);
+            if (previousprevious != -1)
+                lamport->request[previousprevious].next = i;
+//             lamport_print(lamport);
+//             printf("\n");
+        }
+        if (lamport->request[i].previous == -1)
+        {
+            lamport->first = i;
         }
         
         lamport->queue_size++; 
