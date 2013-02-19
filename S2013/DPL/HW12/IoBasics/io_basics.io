@@ -84,51 +84,53 @@ Dog speak :=  "Woof!"
 #  Io> "aa + 3 = #{aa + 3}" interpolate
 #  ==> aa + 3 = 8
 
-Matrix := Object clone
+Matrix := List clone
 
 Matrix dim := method(height, width,
-    line := list()
+    line := Matrix clone
     for(i,1,width,line append(0))
-    matrix := list()
+    matrix := Matrix clone
     for(j,1,height,matrix append(line))
+    matrix width := width
+    matrix height := height
     matrix)
 
-List set := method(y,x,v,
+Matrix set := method(y,x,v,
     line := self at(y)
-    newline := list()
+    newline := Matrix clone
     for(i,0,line size -1,
         if (i == x,newline append(v),newline append(line at(i))))
     atPut(y,newline))
     
-List get := method(y,x,
+Matrix get := method(y,x,
     self at(y) at(x))
 
-List mapIndexes := method(fn,
-    height := self size
-    width := self at(0) size
+Matrix mapIndexes := method(fn,
+    height := self height
+    width := self width
     A := Matrix dim(height,width)
     for(i,0,height-1,
         for(j,0,width-1,
             A := A set(i,j,fn call(i,j,self get(i,j))))))
             
-List transpose := method(
-    height := self size
-    width := self at(0) size
+Matrix transpose := method(
+    height := self height
+    width := self width
     A := Matrix dim(width,height)
     for(i,0,height-1,
         for(j,0,width-1,
             A := A set(j,i,self get(i,j)))))
             
-List asString2 := method(
-    height := self size
-    width := self at(0) size
-    a := "Matrix (#{height}, #{width})\n" interpolate asMutable
+Matrix asString := method(
+    height := self height
+    width := self width
+    a := "Matrix(#{height}, #{width}):\n" interpolate asMutable
     for(i,0,height - 1,
         for(j,0,width -1,
             b := " #{self get(i,j)}" interpolate asMutable
             a appendSeq(b))
             a appendSeq("\n"))
-    a interpolate)
+    a interpolate asMutable)
 
 
 

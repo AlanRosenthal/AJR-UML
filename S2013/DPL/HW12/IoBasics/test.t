@@ -18,10 +18,9 @@ sub eval_io {
 
     my $result = `io "$tmp_file"`;
     chomp $result;
-
     unlink $tmp_file;
 
-    #say qq{eval_io("$eval_code") => $result};
+#    say qq{eval_io("$eval_code") => $result};
 
     return $result;
 }
@@ -107,5 +106,8 @@ Matrix(4, 4):
  0 1 0 5
  0 0 7 0
 DONE
-
 ok(eqw(eval_io("$mkmat; aa transpose"), $mat1), "matrix - transpose");
+say "a";
+say $mat1;
+say "b";
+say eval_io("$mkmat; aa transpose");
