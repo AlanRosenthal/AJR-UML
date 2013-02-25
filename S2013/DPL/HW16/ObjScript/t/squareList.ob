@@ -1,0 +1,26 @@
+
+List.map := fun(fn)
+  if (length() == 0)
+    [];
+  else
+    x  := head();
+    xs := tail();
+    y  := fn(x);
+    ys := xs.map(fn);
+    ys.cons(y);
+  end
+end;
+
+List.squareList := fun()
+  square := fun(x) x*x end;
+  map(square);
+end;
+
+List.sum := fun()
+  if (length() == 0)
+    0;
+  else
+    xs := tail();
+    head() + xs.sum();
+  end
+end;
