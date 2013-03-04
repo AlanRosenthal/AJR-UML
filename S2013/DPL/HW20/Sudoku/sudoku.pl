@@ -27,7 +27,7 @@
 %
 % When a puzzle is passed in as Puzzle,
 % Solution should be a solution with
-% concreten numbers in place of the _'s.
+% concreten numbers in place of the _s.
 
 sudoku(Solution, Puzzle) :-
         Solution = Puzzle.
