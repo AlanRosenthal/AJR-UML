@@ -12,4 +12,29 @@
 %   http://www.erlang.org/doc/man/string.html
 
 main(Args) ->
-    io:format("Case #1: ~s\n", Args).
+    {ok,File} = file:open(Args,[read]),
+    io:get_line(File,""),
+    AllLines = read_all_lines(File),
+    T9 = lists:map(fun(X) -> t9(X) end,AllLines),
+    print_all(T9,1).
+
+read_all_lines(File) ->
+    Data = io:get_line(File,""),
+    if
+        Data == eof -> [];
+        Data /= eof -> [string:strip(Data,right,10)|read_all_lines(File)]
+    end.
+
+t9([]) -> [];
+t9([X|Xs]) ->
+    Map = [" ","","abc","def","ghi","jkl","mno","pqrs","tuv","wxyz"],
+    [X|Xs].
+
+t9_replace(X,[Map|Maps]) ->
+    
+    
+    
+print_all([],_) -> [];
+print_all([X|Xs],N) ->
+    io:format("Case #~p: ~s~n",[N,X]),
+    print_all(Xs,N+1).
