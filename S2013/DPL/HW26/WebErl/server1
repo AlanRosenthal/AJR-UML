@@ -1,0 +1,5 @@
+#!/usr/bin/env escript
+% -*- erlang -*- vim: set filetype=erlang :
+
+main(_Args) ->
+    server1:start().

@@ -1,0 +1,15 @@
+#!/usr/bin/env escript
+% -*- erlang -*- vim: set filetype=erlang :
+
+% Do Reverse Words in Erlang.
+%
+% The input file will be the first command line argument,
+% print your output to stdout.
+%
+% Here's some relevent documentation:
+%   http://www.erlang.org/doc/man/file.html
+%   http://www.erlang.org/doc/man/lists.html
+%   http://www.erlang.org/doc/man/string.html
+
+main(Args) ->
+    io:format("Case #1: ~s\n", Args).

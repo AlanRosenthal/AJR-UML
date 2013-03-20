@@ -1,0 +1,8 @@
+#!/usr/bin/env escript
+% -*- erlang -*- vim: set filetype=erlang :
+
+% This will be overwritten during auto-grading.
+
+main(_Args) ->
+    primes:start(),
+    primes:print_primes_under_a_million().
