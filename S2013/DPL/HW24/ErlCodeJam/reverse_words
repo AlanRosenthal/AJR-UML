@@ -12,4 +12,23 @@
 %   http://www.erlang.org/doc/man/string.html
 
 main(Args) ->
-    io:format("Case #1: ~s\n", Args).
+    {ok,File} = file:open(Args,[read]),
+    string:strip(io:get_line(File,""),right,10),
+    AllLines = read_all_lines(File),
+    ReversedWords = lists:map(fun(X) -> reverse_words(X) end,AllLines),
+    print_all(ReversedWords,1).
+
+read_all_lines(File) ->
+    Data = io:get_line(File,""),
+    if
+        Data == eof -> [];
+        Data /= eof -> [string:strip(Data,right,10)|read_all_lines(File)]
+    end.
+
+reverse_words(Xs) ->
+    string:join(lists:reverse(string:tokens(Xs," "))," ").
+    
+print_all([],_) -> [];
+print_all([X|Xs],N) ->
+    io:format("Case #~p: ~s~n",[N,X]),
+    print_all(Xs,N+1).
