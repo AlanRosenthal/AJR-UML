@@ -23,18 +23,51 @@ read_all_lines(File) ->
     if
         Data == eof -> [];
         Data /= eof -> [string:strip(Data,right,10)|read_all_lines(File)]
-    end.
-
-t9([]) -> [];
-t9([X|Xs]) ->
-    Map = [" ","","abc","def","ghi","jkl","mno","pqrs","tuv","wxyz"],
-    [X|Xs].
-
-t9_replace(X,[Map|Maps]) ->
-    
-    
+    end.  
     
 print_all([],_) -> [];
 print_all([X|Xs],N) ->
     io:format("Case #~p: ~s~n",[N,X]),
     print_all(Xs,N+1).
+
+t9(X) ->
+    Replaced = t9_replace(X),
+    Paused = t9_addpause(Replaced),
+    t9_expand(Paused).
+    
+t9_expand([]) -> [];
+t9_expand([{X,N}|Xs]) ->
+    if
+        N == 0 -> t9_expand(Xs);
+        N > 0 -> [X|t9_expand([{X,N-1}|Xs])]
+    end.
+
+t9_addpause([]) -> [];
+t9_addpause([Xa]) -> [Xa];
+t9_addpause([Xa,Xb|Xs]) ->
+    A = element(1,Xa) == element(1,Xb),
+    if
+        % 32 is space
+        A == true -> [Xa,{32,1}|t9_addpause([Xb|Xs])];
+        A == false -> [Xa|t9_addpause([Xb|Xs])]
+    end.
+
+t9_replace([]) -> [];
+t9_replace([X|Xs]) ->
+    Map = [" ","","abc","def","ghi","jkl","mno","pqrs","tuv","wxyz"],
+    [t9_replace_rec(X,Map,0)|t9_replace(Xs)].
+
+t9_replace_rec(X,[Map|Maps],N) ->
+    A = lists:map(fun(Y) -> Y == X end,Map),
+    B = lists:any(fun(Y) -> Y == true end,A),
+    if
+        B == false -> t9_replace_rec(X,Maps,N+1);
+        %48 is ascii offset for digit
+        B == true -> {N+48,find_true(A,0)+1}
+    end.
+
+find_true([X|Xs],N) ->
+    if
+        X == true -> N;
+        X == false -> find_true(Xs,N+1)
+    end.
