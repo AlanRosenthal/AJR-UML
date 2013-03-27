@@ -29,6 +29,12 @@ simplify (Apply (Lambda char body) tree) =
     where st = (free tree (emptyState,emptyState,fullState))
           body' = rename body st
 
+simplify (Apply x y) =
+    (Apply (simplify x) (simplify y))
+
+simplify (Lambda char body) =
+    (Lambda char $ simplify body)
+
 simplify x = x
 
 rename (Name x) (stF,stB,stU) = 
