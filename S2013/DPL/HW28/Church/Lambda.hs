@@ -21,8 +21,8 @@ test x = showLx $ simplify $ parseLambda x
 test2 x = showLx $ keepsimplify (Number 1000) (parseLambda x)
 
 keepsimplify x y =
-    if x == (trace (showLx y) y)
---     if x == y
+--     if x == (trace (showLx y) y)
+    if x == y
        then x
        else keepsimplify y (simplify y)
 
@@ -30,26 +30,33 @@ simplify (Symbol x) =
     case x of
          'I' -> parseLambda "(&x.x)"
          'S' -> parseLambda "(&w.(&y.(&x.y(wyx))))"
+         '+' -> parseLambda "(&x.(&y.x(&w.(&y.(&x.y(wyx))))y))"
+         '*' -> parseLambda "(&x.(&y.(&z.x(yz))))"
          
 simplify (Number x) =
     if (x == 0)
          then parseLambda "(&s.(&z.z))"
          else simplify (Apply (Symbol 'S') (Number (x-1)))
-       
-       
+
+
 simplify (Apply (Lambda char body) tree) = 
-    replace (Name char) tree body'
+--     trace ("\nApply [Lambda {" ++ [char] ++ "} -> " ++ showLx body ++ "] TO " ++ showLx tree) $ replace (Name char') tree body'
+    replace (Name char') tree body'
     where st = (free2 tree (emptyState,emptyState))
-          body' = rename2 body st (free2 body (emptyState,emptyState))
+          (Lambda char' body') = rename2 (Lambda char body) st (free2 (Lambda char body) (emptyState,emptyState))
 
 simplify (Apply x y) =
+--     trace ("\nApply: " ++ showLx x ++ " TO " ++ showLx y) $ (Apply (simplify x) (simplify y))
     (Apply (simplify x) (simplify y))
 
 simplify (Lambda char body) =
+--     trace ("\nLambda: {" ++ [char] ++ "} -> " ++ showLx body) $ (Lambda char $ simplify body)
     (Lambda char $ simplify body)
 
-simplify x = x
-
+simplify x = 
+--     trace ("\nFALL OFF EDGE: " ++ showLx x) x
+    x
+    
 -- rename (Name x) (stF,stB,stU) = 
 --     if (elem x stF)
 --        then (Name (stU !! (findpos x stF)))
