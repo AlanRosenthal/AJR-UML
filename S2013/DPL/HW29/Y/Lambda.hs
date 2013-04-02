@@ -6,7 +6,7 @@ import Data.List
 
 main = do
     code <- getContents
-    putStrLn $ showLx $ keepsimplify (Number 1000) (parseLambda code)
+    putStrLn $ showLx $ keepsimplify (Number 1000) (replaceSymbolNumber (parseLambda code))
 
 fullState = ['a'..'z'] ++ ['A'..'Z'] 
 
@@ -19,7 +19,7 @@ addState st x =
     union st x
 
 test x = showLx $ simplify $ parseLambda x
-test2 x = showLx $ keepsimplify (Number 1000) (parseLambda x)
+test2 x = showLx $ keepsimplify (Number 1000) (replaceSymbolNumber (parseLambda x))
 
 keepsimplify x y =
     if x == (trace (showLx y) y)
@@ -27,7 +27,7 @@ keepsimplify x y =
        then x
        else keepsimplify y (simplify y)
 
-simplify (Symbol x) =
+replaceSymbolNumber (Symbol x) =
     case x of
         'I' -> parseLambda "(&x.x)"
         'S' -> parseLambda "(&w.(&y.(&x.y(wyx))))"
@@ -38,19 +38,27 @@ simplify (Symbol x) =
         '∧' -> parseLambda "(&xy.xy(&uv.v))"
         '∨' -> parseLambda "(&xy.x(&uv.u)y)"
         'N' -> parseLambda "(&x.x(&uv.v)(&ab.a))"
-        'Z' -> simplify $ parseLambda "(&x.xFNF)"
+        'Z' -> replaceSymbolNumber $ parseLambda "(&x.xFNF)"
         'P' -> parseLambda "(&n.&f.&x.n(&g.&h.h(gf))(&u.x)(&u.u))"
         'Y' -> parseLambda "(&g.((&x.g(xx))(&x.g(xx))))"
-        'R' -> simplify $ parseLambda "(&rn.Zn0(nS(r(Pn))))"
+        'R' -> replaceSymbolNumber $ parseLambda "(&rn.Zn0(nS(r(Pn))))"
 --         'A' -> simplify $ parseLambda "(&rn.Zn1(*n(r(Pn))))"
-        'A' -> simplify $ parseLambda "(&rn.Zn1(*n(r(Pn))))"
+        'A' -> replaceSymbolNumber $ parseLambda "(&rn.Zn1(*n(r(Pn))))"
         '-' -> error "Subtraction"
         '/' -> error "Division by repeated subtraction (recursive)"
 
-simplify (Number x) =
+replaceSymbolNumber (Number x) = 
     if (x == 0)
          then parseLambda "(&s.(&z.z))"
-         else simplify (Apply (Symbol 'S') (Number (x-1)))
+         else replaceSymbolNumber (Apply (Symbol 'S') (Number (x-1)))
+replaceSymbolNumber (Apply x y) =
+    (Apply (replaceSymbolNumber x) (replaceSymbolNumber y))
+
+replaceSymbolNumber (Lambda char body) =
+    (Lambda char (replaceSymbolNumber body))
+
+replaceSymbolNumber (Name x) =
+    (Name x)
 
 simplify (Apply (Lambda char body) tree) = 
 --     trace ("\nApply [Lambda {" ++ [char] ++ "} -> " ++ showLx body ++ "] TO " ++ showLx tree) $ replace (Name char') tree body'
@@ -59,8 +67,12 @@ simplify (Apply (Lambda char body) tree) =
           (Lambda char' body') = rename2 (Lambda char body) st (free2 (Lambda char body) (emptyState,emptyState))
 
 simplify (Apply x y) =
+    compressApply $ simplifyApply $ expandApply (Apply x y)
+--     where expanded = expandApply (Apply x y)
 --     trace ("\nApply: " ++ showLx x ++ " TO " ++ showLx y) $ (Apply (simplify x) (simplify y))
-    (Apply (simplify x) (simplify y))
+--     compressApply $ simplifyApply $ (expandApply (Apply x y))
+--     compressApply $ foldl (\a b -> a ++ b) [] $ map expandApply $ simplifyApply $ expandApply (Apply x y)
+        
 
 simplify (Lambda char body) =
 --     trace ("\nLambda: {" ++ [char] ++ "} -> " ++ showLx body) $ (Lambda char $ simplify body)
@@ -83,6 +95,29 @@ simplify x =
 --        then (Lambda (stU !! (findpos char stF)) (rename body (stF,stB,stU)))
 --        else (Lambda char (rename body (stF,stB,stU)))
 
+expandApply (Apply a b) =
+   (expandApply a) ++ [b]
+   
+expandApply x = [x]
+
+expandApplytest x = expandApply $ parseLambda x
+
+simplifyApply [] = []
+
+simplifyApply ((Lambda char body):x:xs) = 
+    (simplify (Apply (Lambda char body) x)) : simplifyApply xs
+
+simplifyApply ((Apply x y):xs) =
+    (compressApply (simplifyApply (expandApply (Apply x y)))) : simplifyApply xs          
+    
+simplifyApply (x:xs) =
+    x : simplifyApply xs
+    
+compressApply [x] = x
+    
+compressApply (xs) =
+    (Apply (compressApply (init xs)) (last xs))
+    
 rename2 (Number x) _ _ = (Number x)
 
 rename2 (Symbol x) _ _ = (Symbol x)
@@ -158,3 +193,8 @@ findpos x (y:ys) =
     if x == y
        then 0
        else 1 + (findpos x ys)
+
+printlist [] =  return ()
+printlist (x:xs) = 
+    do print x
+       printlist xs
