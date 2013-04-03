@@ -8,7 +8,7 @@ main = do
     code <- getContents
     putStrLn $ showLx $ keepsimplify (Number 1000) (replaceSymbolNumber (parseLambda code))
 
-fullState = ['a'..'z'] ++ ['A'..'Z'] 
+fullState = ['a'..'z'] ++ ['A'..'Z']
 
 emptyState = []
 
@@ -51,6 +51,7 @@ replaceSymbolNumber (Number x) =
     if (x == 0)
          then parseLambda "(&s.(&z.z))"
          else replaceSymbolNumber (Apply (Symbol 'S') (Number (x-1)))
+         
 replaceSymbolNumber (Apply x y) =
     (Apply (replaceSymbolNumber x) (replaceSymbolNumber y))
 
@@ -65,14 +66,18 @@ simplify (Apply (Lambda char body) tree) =
     replace (Name char') tree body'
     where st = (free2 tree (emptyState,emptyState))
           (Lambda char' body') = rename2 (Lambda char body) st (free2 (Lambda char body) (emptyState,emptyState))
-
+          
 simplify (Apply x y) =
-    compressApply $ simplifyApply $ expandApply (Apply x y)
+    if (x == x')
+       then (Apply x (simplify y))
+       else (Apply x' y)
+    where
+        x' = simplify x
+   --     compressApply $ simplifyApply $ expandApply (Apply x y)
 --     where expanded = expandApply (Apply x y)
 --     trace ("\nApply: " ++ showLx x ++ " TO " ++ showLx y) $ (Apply (simplify x) (simplify y))
 --     compressApply $ simplifyApply $ (expandApply (Apply x y))
---     compressApply $ foldl (\a b -> a ++ b) [] $ map expandApply $ simplifyApply $ expandApply (Apply x y)
-        
+--     compressApply $ foldl (\a b -> a ++ b) [] $ map expandApply $ simplifyApply $ expandApply (Apply x y)        
 
 simplify (Lambda char body) =
 --     trace ("\nLambda: {" ++ [char] ++ "} -> " ++ showLx body) $ (Lambda char $ simplify body)
