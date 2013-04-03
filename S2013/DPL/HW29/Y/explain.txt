@@ -1,0 +1,64 @@
+simplify LambdaTree //this will reduce a lambdatree
+    LambdaTree = (Apply (Lambda char body) tree) //applying a lambda to a tree
+        (free,_) = findfreebound tree emptyState //free variables in the tree
+        (_,bound) = findfreebound (Lambda char body) emptyState//bound variables in the lambda
+        (Lambda charx bodyx) = rename (Lambda char body) free bound //renamed char' and body' to avoid conflict
+        replace (Name charx) tree bodyx //replace [this] [with this] [in this]
+    LambdaTree = (Apply x y)
+        xx = simplify x
+        if (x == xx) //nothing to simplify
+            (Apply x (simplify y))
+        else
+            (Apply xx y) // dont simplify y
+    LambdaTree = (Lambda char body)
+        (Lambda char (simplify body)) //only a lambda, move into it
+    LambdaTree x = x //everything return as it.
+
+rename LambdaTree free bound
+    LambdaTree = (Name x)
+        if (x in free && x in bound) //x is in the bound list and the free list
+            unused = [a..z] remove free remove bound //unsed is [a..z] without anything in the free or bound list
+            pos = findpos x in free //finds the position of x in the list free
+            xx = unused !! pos //takes the pos elemenet from unused.
+            (Name xx)
+        else //else
+            (Name x)
+    LambdaTree = (Apply x y) free bound
+        (Apply (rename x free bound) (rename y free bound)) //recursively call things inside an apply call
+    LambdaTree = (Lambda char body) free bound
+        if (char in free)
+            unused = [a..z] remove free remove bound //unsed is [a..z] without anything in the free or bound list
+            pos = findpos char in free //finds the position of x in the list free
+            charx = unused !! pos //takes the pos elemenet from unused
+            (Lambda charx (rename body free bound)) //rename char to char', recursively call rename on the body
+        else
+            (Lambda char (rename body free bound))
+
+findfreebound LambdaTree (free,bound)
+    LambdaTree = (Name x)
+        if (x in bound) //if x is already bound, just return what you got
+            (free,bound)
+        else
+            freex = union free x //if x is not bound, it must be free. union so there are no duplicates
+            (freex,bound)
+    LambdaTree = (Lambda char body) (free,bound)
+        boundx = union bound char //add char to bound
+        findfreebound body (free,boundx) //recursively call findfreebound on body
+    LambdaTree = (Apply x y) (free,bound)
+        (freex,boundx) = findfreebound x (free,bound) //first do x, then do y
+        findfreebound y (freex,boundx)
+        
+//replace [this] [with this] [in this]
+replace char repwith LambdaTree
+    LambdaTree = (Name x)
+        if ((Name x) == char) //the lambda tree matches, replace it
+            repwith
+        else
+            (Name x)
+    LambdaTree = (Apply x y)
+        (Apply (replace char repwith x) (replace char repwith y)) //recursively call on x and y
+    LambdaTree = (Lambda lchar body)
+        if ((Name lchar) == char) //if i hit a lambda with the same name, the scope changes, stop 
+            (Lambda lchar body)
+        else //else replace the lambda
+            (Lambda lchar (replace char repwith body))

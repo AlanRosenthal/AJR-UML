@@ -8,7 +8,7 @@ main = do
     code <- getContents
     putStrLn $ showLx $ keepsimplify (Number 1000) (replaceSymbolNumber (parseLambda code))
 
-fullState = ['a'..'z'] ++ ['A'..'Z']
+fullState = ['a'..'z']
 
 emptyState = []
 
@@ -43,7 +43,7 @@ replaceSymbolNumber (Symbol x) =
         'Y' -> parseLambda "(&g.((&x.g(xx))(&x.g(xx))))"
         'R' -> replaceSymbolNumber $ parseLambda "(&rn.Zn0(nS(r(Pn))))"
 --         'A' -> simplify $ parseLambda "(&rn.Zn1(*n(r(Pn))))"
-        'A' -> replaceSymbolNumber $ parseLambda "(&rn.Zn1(*n(r(Pn))))"
+        'A' -> replaceSymbolNumber $ parseLambda "Y(&rn.Zn1(*n(r(Pn))))"
         '-' -> error "Subtraction"
         '/' -> error "Division by repeated subtraction (recursive)"
 
@@ -51,7 +51,7 @@ replaceSymbolNumber (Number x) =
     if (x == 0)
          then parseLambda "(&s.(&z.z))"
          else replaceSymbolNumber (Apply (Symbol 'S') (Number (x-1)))
-         
+
 replaceSymbolNumber (Apply x y) =
     (Apply (replaceSymbolNumber x) (replaceSymbolNumber y))
 
@@ -66,7 +66,7 @@ simplify (Apply (Lambda char body) tree) =
     replace (Name char') tree body'
     where st = (free2 tree (emptyState,emptyState))
           (Lambda char' body') = rename2 (Lambda char body) st (free2 (Lambda char body) (emptyState,emptyState))
-          
+
 simplify (Apply x y) =
     if (x == x')
        then (Apply x (simplify y))
@@ -119,30 +119,24 @@ simplifyApply (x:xs) =
     x : simplifyApply xs
     
 compressApply [x] = x
-    
+
 compressApply (xs) =
     (Apply (compressApply (init xs)) (last xs))
-    
-rename2 (Number x) _ _ = (Number x)
 
-rename2 (Symbol x) _ _ = (Symbol x)
-
-rename2 (Name x) (stF,_) (_,stB') =
-    if (elem x stB')
-        then if (elem x stF)
-            then (Name (((fullState \\ stF) \\ stB') !! (findpos x stF)))
+rename2 (Name x) (free,_) (_,bound) =
+    if (elem x bound)
+        then if (elem x free)
+            then (Name (((fullState \\ free) \\ bound) !! (findpos x free)))
             else (Name x)
         else (Name x)
 
 rename2 (Apply x y) st st' =
     (Apply (rename2 x st st') (rename2 y st st'))
 
-rename2 (Lambda char body) (stF,stB) (stF',stB')  =
-    if (elem char stF)
-        then (Lambda (((fullState \\ stF) \\ stB') !! (findpos char stF)) (rename2 body (stF,stB) (stF',stB')))
-        else (Lambda char (rename2 body (stF,stB) (stF',stB')))
-
--- rename2 a _ _  = error $ "Rename: " ++ showLx a
+rename2 (Lambda char body) st@(free,_) st'@(_,bound)  =
+    if (elem char free)
+        then (Lambda (((fullState \\ free) \\ bound) !! (findpos char free)) (rename2 body st st'))
+        else (Lambda char (rename2 body st st'))
 
 rename2test x y =
     rename2 (parseLambda x) (free2 (parseLambda y) (emptyState,emptyState)) (free2 (parseLambda x) (emptyState,emptyState))
@@ -150,15 +144,15 @@ rename2test x y =
 freetest2 x =
     free2 (parseLambda x) (emptyState,emptyState)
 
-free2 (Number x) st = st
-free2 (Symbol x) st = st
 free2 (Name x) (stF,stB) = 
     if (elem x stB)
         then (stF,stB)
         else (addState stF [x],stB)
 
 free2 (Apply x y) st = 
-    free2 x (free2 y st)
+    free2 y st'
+    where
+        st' = free2 x st
 
 free2 (Lambda char body) (stF,stB) =
     free2 body (stF,addState stB [char])
@@ -187,12 +181,6 @@ replace char repwith (Lambda lchar body) =
        then (Lambda lchar body)
        else (Lambda lchar $ replace char repwith body)
 
-replace _ _ (Number x) = (Number x)
-
-replace _ _ (Symbol x) = (Symbol x)
-
--- replace _ _ x = error $ "Replace: " ++ showLx x
-       
 findpos _ [] = error "Not in list"
 findpos x (y:ys) =
     if x == y
