@@ -22,16 +22,24 @@ test x = showLx $ simplify $ parseLambda x
 test2 x = showLx $ keepsimplify (Number 1000) (replaceSymbolNumber (parseLambda x))
 
 keepsimplify x y =
-    if x == (trace (showLx y) y)
---     if x == y
+--     if x == (trace (showLx y) y)
+    if x == y
        then x
        else keepsimplify y (simplify y)
+
+test3 x = showLx $ keepaddSymbolNumber (Number 0) (addSymbolNumber $ parseLambda x)
+
+keepaddSymbolNumber x y =
+    if x == y
+       then x
+       else keepaddSymbolNumber y (addSymbolNumber y)
 
 replaceSymbolNumber (Symbol x) =
     case x of
         'I' -> parseLambda "(&x.x)"
         'S' -> parseLambda "(&w.(&y.(&x.y(wyx))))"
-        '+' -> parseLambda "(&x.(&y.x(&w.(&y.(&x.y(wyx))))y))"
+--         '+' -> parseLambda "(&x.(&y.x(&w.(&y.(&x.y(wyx))))y))"
+        '+' -> replaceSymbolNumber $ parseLambda "(&x.(&y.xSy))"
         '*' -> parseLambda "(&x.(&y.(&z.x(yz))))"
         'T' -> parseLambda "(&xy.x)"
         'F' -> parseLambda "(&xy.y)"
@@ -39,12 +47,13 @@ replaceSymbolNumber (Symbol x) =
         '∨' -> parseLambda "(&xy.x(&uv.u)y)"
         'N' -> parseLambda "(&x.x(&uv.v)(&ab.a))"
         'Z' -> replaceSymbolNumber $ parseLambda "(&x.xFNF)"
-        'P' -> parseLambda "(&n.&f.&x.n(&g.&h.h(gf))(&u.x)(&u.u))"
+--         'P' -> parseLambda "(&n.&f.&x.n(&g.&h.h(gf))(&u.x)(&u.u))"      
+        'P' -> replaceSymbolNumber $ parseLambda "(&n.n((&pz.z(S(pT))(pT)))(&z.(z0)0)F)"
         'Y' -> parseLambda "(&g.((&x.g(xx))(&x.g(xx))))"
         'R' -> replaceSymbolNumber $ parseLambda "(&rn.Zn0(nS(r(Pn))))"
 --         'A' -> simplify $ parseLambda "(&rn.Zn1(*n(r(Pn))))"
         'A' -> replaceSymbolNumber $ parseLambda "Y(&rn.Zn1(*n(r(Pn))))"
-        '-' -> error "Subtraction"
+        '-' -> replaceSymbolNumber $ parseLambda "(&x.(&y.yPx))"
         '/' -> error "Division by repeated subtraction (recursive)"
 
 replaceSymbolNumber (Number x) = 
@@ -60,6 +69,101 @@ replaceSymbolNumber (Lambda char body) =
 
 replaceSymbolNumber (Name x) =
     (Name x)
+
+-- addSymbolNumber l@(Lambda s (Lambda z (Name z'))) =
+--     if (z == z')
+--        then (Number 0)
+--        else l
+-- 
+-- addSymbolNumber l@(Lambda x (Name x')) =
+--     if (x == x')
+--        then (Symbol 'I')
+--        else l
+-- 
+-- addSymbolNumber l@(Lambda w (Lambda y (Lambda x (Apply (Name y') (Apply (Apply (Name w') (Name y'')) (Name x')))))) = 
+--     if (and [w == w',y == y',y == y'',x == x'])
+--        then (Symbol 'S')
+--        else l
+-- 
+-- addSymbolNumber l@(Lambda x (Lambda y (Apply (Apply (Name x') (Symbol 'S')) (Name y')))) = 
+--     if (and [x == x',y == y'])
+--        then (Symbol '+')
+--        else l
+-- 
+-- addSymbolNumber l@(Lambda x (Lambda y (Lambda z (Apply (Name x') (Apply (Name y') (Name z')))))) = 
+--     if (and [x == x',y == y',z == z'])
+--        then (Symbol '*')
+--        else l
+-- 
+-- addSymbolNumber l@(Lambda x (Lambda y (Name x'))) = 
+--     if (and [x == x'])
+--        then (Symbol 'T')
+--        else l
+-- 
+-- addSymbolNumber l@(Lambda x (Lambda y (Name y'))) = 
+--     if (and [y == y'])
+--        then (Symbol 'F')
+--        else l
+-- 
+-- addSymbolNumber l@(Lambda x (Lambda y (Apply (Apply (Name x') (Name y')) (Lambda u (Lambda v (Name v')))))) = 
+--     if (and [x == x',y == y',v == v'])
+--        then (Symbol '∧')
+--        else l
+-- 
+-- addSymbolNumber l@(Lambda x (Lambda y (Apply (Apply (Name x') (Lambda u (Lambda v (Name u')))) (Name y')))) = 
+--     if (and [x == x',y == y',u == u'])
+--        then (Symbol '∨')
+--        else l
+-- 
+-- addSymbolNumber l@(Lambda x (Apply (Apply (Name x') (Lambda u (Lambda v (Name v')))) (Lambda a (Lambda b (Name a'))))) = 
+--     if (and [x == x',v == v',a == a'])
+--        then (Symbol 'N')
+--        else l
+-- 
+-- addSymbolNumber l@(Lambda x (Apply (Apply (Apply (Name x') (Symbol 'F')) (Symbol 'N')) (Symbol 'F'))) = 
+--     if (and [x == x'])
+--        then (Symbol 'Z')
+--        else l
+-- 
+-- addSymbolNumber l@(Lambda x (Apply (Apply (Apply (Name x') (Number 0)) (Symbol 'N')) (Number 0))) = 
+--     if (and [x == x'])
+--        then (Symbol 'Z')
+--        else l
+-- 
+-- addSymbolNumber l@(Lambda n (Apply (Apply (Apply (Name n') (Lambda p (Lambda z (Apply (Apply (Name z') (Apply (Symbol 'S') (Apply (Name p') (Symbol 'T')))) (Apply (Name p'') (Symbol 'T')))))) (Lambda z''' (Apply (Apply (Name z'''') (Number 0)) (Number 0)))) (Symbol 'F'))) = 
+--     if (and [n == n',p == p',p == p'',z == z',z''' == z''''])
+--        then (Symbol 'P')
+--        else l
+-- 
+-- addSymbolNumber l@() = 
+--     if (and [])
+--        then (Symbol 'Y')
+--        else l
+-- 
+-- addSymbolNumber l@() = 
+--     if (and [])
+--        then (Symbol 'R')
+--        else l
+
+
+
+addSymbolNumber l@(Apply (Symbol 'S') (Number x)) = 
+    (Number (x+1))
+addSymbolNumber (Apply x y) =
+    (Apply (addSymbolNumber x) (addSymbolNumber y))
+
+addSymbolNumber (Lambda char body) = 
+    (Lambda char (addSymbolNumber body))
+
+addSymbolNumber (Name x) = 
+    (Name x)
+
+addSymbolNumber (Symbol x) =
+    (Symbol x)
+
+addSymbolNumber (Number x) = 
+    (Number x)
+
 
 simplify (Apply (Lambda char body) tree) = 
 --     trace ("\nApply [Lambda {" ++ [char] ++ "} -> " ++ showLx body ++ "] TO " ++ showLx tree) $ replace (Name char') tree body'
@@ -140,7 +244,7 @@ rename2 (Lambda char body) st@(free,_) st'@(_,bound)  =
 
 rename2test x y =
     rename2 (parseLambda x) (free2 (parseLambda y) (emptyState,emptyState)) (free2 (parseLambda x) (emptyState,emptyState))
-    
+
 freetest2 x =
     free2 (parseLambda x) (emptyState,emptyState)
 

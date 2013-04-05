@@ -16,7 +16,7 @@ showLx (Name vv)      = [vv]
 showLx (Apply aa bb@(Apply _ _)) =
   showLx aa ++ "(" ++ showLx bb ++ ")"
 showLx (Apply aa bb)  = showLx aa ++ showLx bb
-showLx (Number nn)    = show nn
+showLx (Number nn)    = " " ++ show nn ++ " "
 showLx (Symbol cc)    = [cc]
 
 nameExpr = 
