@@ -41,7 +41,7 @@ replaceSymbolNumber (Symbol x) =
         'A' -> replaceSymbolNumber $ parseLambda "Y(&an.Zn1(*n(a(Pn))))"
         'L' -> replaceSymbolNumber $ parseLambda "(&a.(&b.(Z(- a b)TF)))"
         'G' -> replaceSymbolNumber $ parseLambda "(&a.(&b.(Z(- b a)TF)))"
-        'D' -> replaceSymbolNumber $ parseLambda "(&dabc.Z(Ga(*b(Sc))c(d(ab(Sc)))))"
+        'D' -> replaceSymbolNumber $ parseLambda "(&dabc.Z((&x.x1F)(Ga(*b(Sc))))c(d(ab(Sc))))"
         '-' -> replaceSymbolNumber $ parseLambda "(&x.(&y.yPx))"
         '/' -> error "Division by repeated subtraction (recursive)"
 replaceSymbolNumber (Number x) = 
@@ -103,7 +103,7 @@ findpos x (y:ys) =
        then 0
        else 1 + (findpos x ys)
 
-divisiontest a b c =
-    if (a >= b*(c+1))
-       then divisiontest a b (c + 1)
-       else c
+divisiontest a b =
+    if ((a-b) < 0)
+       then 0
+       else 1 + (divisiontest (a-b) b)
