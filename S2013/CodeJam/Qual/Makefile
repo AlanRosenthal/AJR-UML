@@ -3,7 +3,7 @@ all:
 
 test:
 	make
-	cat A-large.in | ./ProbA > A-large.out
+	cat test/A-large.in | ./ProbA > test/A-large.out
 
 test2:
 	make
