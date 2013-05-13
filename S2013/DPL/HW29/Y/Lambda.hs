@@ -104,6 +104,6 @@ findpos x (y:ys) =
        else 1 + (findpos x ys)
 
 divisiontest a b =
-    if ((a-b) < 0)
+    if ((a-b) >= 0)
        then 0
        else 1 + (divisiontest (a-b) b)
