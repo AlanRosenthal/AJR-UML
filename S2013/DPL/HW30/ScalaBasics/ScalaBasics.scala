@@ -8,18 +8,38 @@
 // methods.
 object ScalaBasics {
   // Implement fib(n) both iteratively and recursively.
-  def fibI(n: Int) = 5
-  
-  def fibR(n: Int):Int = 5
-  
+  def fibI(n: Int) = {
+    var termA = 1
+    var termB = 1
+    var termC = 1
+    for (i <- 3 to n)
+    {
+        termA = termB
+        termB = termC
+        termC = termA + termB
+    }
+    termC
+  }
+  def fibR(n: Int):Int = {
+    n match {
+        case 2 => 1
+        case 1 => 1
+        case _ => fibR(n - 1) + fibR(n - 2)
+    }
+  }
   // Square each item in the array, in place.
-  def squareArrayInPlace(xs: Array[Int]) = Array(5)
+  def squareArrayInPlace(xs: Array[Int]) = {
+    for (i <- 0 to (xs.length) - 1)
+    {
+        xs(i) = xs(i) * xs(i)
+    }
+  }
   
   // Return a new list with each item squared.
-  def squareList(xs: List[Int]) = List(5)
+  def squareList(xs: List[Int]) = xs.map(x => x*x)
   
   // Map from Fold
-  def map(fn: Any, xs: List[Int]) = List(5)
+  def map(fn: Int, xs: List[Int]) = List()
 }
   
 // Define Duck, Dog, and Mouse classes that inherit from Animal.
