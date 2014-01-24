@@ -5,6 +5,7 @@ int main()
     sf::RenderWindow window(sf::VideoMode(400, 600), "SFML works!");
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
+    window.setFramerateLimit(60);
     int dir_x = 1;
     int dir_y = 1;
     float speed_x = 1;
