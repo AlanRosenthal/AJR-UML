@@ -14,6 +14,7 @@
 #temp files
 *~
 *.kate-swp
+*.swp
 
 #racket files
 *.rkt#?#

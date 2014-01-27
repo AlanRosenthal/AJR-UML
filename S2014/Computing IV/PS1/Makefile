@@ -4,7 +4,7 @@ solarsystem: main.o
 	g++ main.o -o solarsystem -lsfml-graphics -lsfml-window -lsfml-system
 
 main.o: main.cpp
-	g++ -c main.cpp planets.hpp
+	g++ -c main.cpp universe.hpp
 
-clean: 
+clean:
 	rm -rf *.o *.gch solarsystem
