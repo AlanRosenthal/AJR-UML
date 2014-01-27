@@ -1,4 +1,8 @@
 #include <SFML/Graphics.hpp>
+#include <iostream>
+
+using namespace std;
+
 
 class Planet { 
     float pos_x;
@@ -20,8 +24,8 @@ class Planet {
 
     void update(void)
     {
-        float km_per_pixel = 5e9;
-        shape.setPosition(pos_x/km_per_pixel+250,pos_y/km_per_pixel+250);
+        float km_per_pixel = 2e9;
+        shape.setPosition(pos_x/km_per_pixel+250-shape.getRadius(),pos_y/km_per_pixel+250-shape.getRadius());
     };
 
 };
