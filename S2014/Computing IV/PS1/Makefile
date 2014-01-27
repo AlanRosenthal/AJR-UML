@@ -7,4 +7,4 @@ main.o: main.cpp
 	g++ -c main.cpp planets.hpp
 
 clean: 
-	rm -rf *.o sfml-app
+	rm -rf *.o *.gch sfml-app
