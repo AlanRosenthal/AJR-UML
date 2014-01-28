@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "universe.hpp"
+#include "planet.hpp"
 #include <iostream>
 #include <fstream>
 
@@ -8,36 +9,36 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     Universe universe;
-    Universe::Planet p[5];
+    Planet p[5];
     ifstream file(argv[3]);
     if (file.is_open())
     {
-        file >> universe.num_planets;
-        file >> universe.universe_size;
-        cout << "TEST\n";
-        for (int i = 0; i < universe.num_planets; i++)
+        int num_planets;
+        float universe_size;
+        float pos_x;
+        float pos_y;
+        float vel_x;
+        float vel_y;
+        float mass;
+        string filename;
+        
+        file >> num_planets;
+        file >> universe_size;
+        universe.set_num_planets(num_planets);
+        universe.set_universe_size(universe_size);
+
+        for (int i = 0; i < universe.get_num_planets(); i++)
         {
-            file >> p[i].pos_x;
-            file >> p[i].pos_y;
-            file >> p[i].vel_x;
-            file >> p[i].vel_y;
-            file >> p[i].mass;
-            file >> p[i].filename;
+            file >> pos_x;
+            file >> pos_y;
+            file >> vel_x;
+            file >> vel_y;
+            file >> mass;
+            file >> filename;
+            Planet p(pos_x,pos_y,vel_x,vel_y,mass,filename);
         }
         file.close();
     }
-    cout << universe.num_planets << "\n";
-    cout << universe.universe_size << "\n";
-    for (int i = 0;i < 5;i++)
-    {
-        cout << "NUMBER " << i << "\n";
-        cout << "pos: " << p[i].pos_x << "," << p[i].pos_y << "\n";
-        cout << "vel: " << p[i].vel_x << "," << p[i].vel_x << "\n";
-        cout << "mass: " << p[i].mass << "\n";
-        cout << "file: " << p[i].filename << "\n";
-    }
-
-
 
     sf::RenderWindow window(sf::VideoMode(500,500),"Solar System");
     window.setFramerateLimit(60);
@@ -48,7 +49,7 @@ int main(int argc, char* argv[])
     
     }
 
-    Universe::Planet sun, mercury, venus, earth, mars;
+/*    Universe::Planet sun, mercury, venus, earth, mars;
 
     sun.shape = sf::CircleShape(20.f);
     sun.shape.setFillColor(sf::Color::Yellow);
@@ -79,9 +80,7 @@ int main(int argc, char* argv[])
     mars.pos_x = 2.2790e+11;
     mars.pos_y = 0;
     mars.mass = 6.4190e+23;
-
-    float time = 0;
-    float deltaTime = 1;
+*/
 
     while (window.isOpen())
     {
@@ -93,11 +92,11 @@ int main(int argc, char* argv[])
         }
         window.clear();
 
-        window.draw(sun.shape);
+/*        window.draw(sun.shape);
         window.draw(mercury.shape);
         window.draw(venus.shape);
         window.draw(earth.shape);
-        window.draw(mars.shape);
+        window.draw(mars.shape);*/
         window.display();
     }
     return 0;
