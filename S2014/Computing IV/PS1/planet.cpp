@@ -1,4 +1,5 @@
 #include "planet.hpp"
+#include <iostream>
 
 Planet::Planet()
 {
@@ -19,9 +20,10 @@ Planet::Planet(int ID, float PosX, float PosY, float VelX, float VelY, float Mas
     vel_y = VelY;
     mass = Mass;
     filename = FileName;
-    sf::Texture texture;
-    texture.loadFromFile(filename);
-    sprite = sf::Sprite(texture);
+    cout << texture.loadFromFile(filename) << endl;
+    sprite.setTexture(texture);
+    cout << "Setting Texture!!!  " << mass << endl;
+    sprite.setPosition(10,10);
 }
 
 Planet::~Planet()
@@ -64,9 +66,9 @@ string Planet::get_filename() const
     return filename;
 }
 
-sf::Sprite Planet::get_sprite() const
+sf::Sprite* Planet::get_sprite()
 {
-    return sprite;
+    return &sprite;
 }
 
 //Mutators
@@ -105,9 +107,9 @@ void Planet::set_filename(string FileName)
     filename = FileName;
 }
 
-void Planet::set_sprite(sf::Sprite Sprite)
+void Planet::set_sprite(sf::Sprite* Sprite)
 {
-    sprite = Sprite;
+    sprite = *Sprite;
 }
 
 

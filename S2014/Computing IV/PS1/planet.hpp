@@ -24,7 +24,7 @@ class Planet {
 	float get_vel_y() const;
 	float get_mass() const;
 	string get_filename() const;
-    sf::Sprite get_sprite() const;
+    sf::Sprite* get_sprite();
 
 	//Mutators
     void set_id(int);
@@ -34,7 +34,7 @@ class Planet {
 	void set_vel_y(float);
 	void set_mass(float);
 	void set_filename(string);
-    void set_sprite(sf::Sprite);
+    void set_sprite(sf::Sprite*);
 
 	private:
 
@@ -46,6 +46,7 @@ class Planet {
 	float mass;
 	string filename;
     sf::Sprite sprite;
+    sf::Texture texture;
 };
 
 #endif

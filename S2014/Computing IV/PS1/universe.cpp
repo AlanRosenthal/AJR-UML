@@ -77,22 +77,6 @@ void Universe::move_planet(Planet &p1, Planet &p2)
     p1.set_vel_y(p1.get_vel_y() + delta_time*ay);
     p1.set_pos_x(p1.get_pos_x() + delta_time*p1.get_vel_x());
     p1.set_pos_y(p1.get_pos_y() + delta_time*p1.get_vel_y());
-
-/*
-    static float G = 6.67e-11;
-    float delta_x = p2->get_pos_x() - p1->get_pos_x();
-    float delta_y = p2->get_pos_y() - p1->get_pos_y();
-    float r = sqrt(pow(delta_x,2)+pow(delta_y,2));
-    float F = G*(p1->get_mass()*p2->get_mass())/(pow(r,2));
-    float Fx = F*delta_x/r;
-    float Fy = F*delta_y/r;
-    float ax = Fx/p1->get_mass();
-    float ay = Fy/p1->get_mass();
-    p1->set_vel_x(p1->get_vel_x() + delta_time*ax);
-    p1->set_vel_y(p1->get_vel_y() + delta_time*ay);
-    p1->set_pos_x(p1->get_pos_x() + delta_time*p1->get_vel_x());
-    p1->set_pos_y(p1->get_pos_y() + delta_time*p1->get_vel_y());
-*/
 }
 
 void Universe::move_all_planets()
@@ -109,5 +93,11 @@ void Universe::move_all_planets()
             cout << i->get_filename() << " " << j->get_filename() << endl;
         }
     }
-
 }
+
+void Universe::draw_planet(sf::RenderWindow *window,Planet *p)
+{
+    sf::Sprite *s = p->get_sprite();
+    window->draw(*s);
+}
+

@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     }
     sf::RenderWindow window(sf::VideoMode(500,500),"Solar System");
     window.setFramerateLimit(60);
-    
+    Planet test_planet(0,10,11,20,21,100,"nbody/earth.gif");
     while (window.isOpen())
     {
         sf::Event event;
@@ -53,9 +53,9 @@ int main(int argc, char* argv[])
                 window.close();
         }
         window.clear();
-
+        //window.draw(sprite);
         //universe.move_all_planets();
-
+        universe.draw_planet(&window,&test_planet);
         window.display();
     }
     return 0;
