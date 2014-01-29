@@ -41,7 +41,7 @@ class Universe {
     int num_planets;
     float delta_time;
     float time;
-    vector<Planet> planets;
+    vector<Planet> planets; 
 };
 
 #endif

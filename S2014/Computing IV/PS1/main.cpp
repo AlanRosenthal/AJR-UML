@@ -9,7 +9,8 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     Universe universe;
-    Planet p[5];
+
+    //read in file
     ifstream file(argv[3]);
     if (file.is_open())
     {
