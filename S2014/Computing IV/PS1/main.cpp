@@ -36,12 +36,11 @@ int main(int argc, char* argv[])
             file >> vel_y;
             file >> mass;
             file >> filename;
-            Planet p(pos_x,pos_y,vel_x,vel_y,mass,filename);
-            universe.add_planets(p);
+            Planet p(i,pos_x,pos_y,vel_x,vel_y,mass,filename);
+            universe.push_planets(p);
         }
         file.close();
     }
-
     sf::RenderWindow window(sf::VideoMode(500,500),"Solar System");
     window.setFramerateLimit(60);
     
@@ -55,11 +54,8 @@ int main(int argc, char* argv[])
         }
         window.clear();
 
-/*        window.draw(sun.shape);
-        window.draw(mercury.shape);
-        window.draw(venus.shape);
-        window.draw(earth.shape);
-        window.draw(mars.shape);*/
+        //universe.move_all_planets();
+
         window.display();
     }
     return 0;

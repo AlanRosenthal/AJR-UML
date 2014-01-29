@@ -2,6 +2,7 @@
 
 Planet::Planet()
 {
+    id = -1;
     pos_x = 0.0;
     pos_y = 0.0;
     vel_x = 0.0;
@@ -9,19 +10,28 @@ Planet::Planet()
     mass = 0.0;
 }
 
-Planet::Planet(float PosX, float PosY, float VelX, float VelY, float Mass, string FileName)
+Planet::Planet(int ID, float PosX, float PosY, float VelX, float VelY, float Mass, string FileName)
 {
+    id = ID;
     pos_x = PosX;
     pos_y = PosY;
     vel_x = VelX;
     vel_y = VelY;
     mass = Mass;
     filename = FileName;
+    sf::Texture texture;
+    texture.loadFromFile(filename);
+    sprite = sf::Sprite(texture);
 }
 
 Planet::~Planet()
 {
 
+}
+
+int Planet::get_id() const
+{
+    return id;
 }
 
 float Planet::get_pos_x() const
@@ -53,6 +63,18 @@ string Planet::get_filename() const
 {
     return filename;
 }
+
+sf::Sprite Planet::get_sprite() const
+{
+    return sprite;
+}
+
+//Mutators
+void Planet::set_id(int ID)
+{
+    id = ID;
+}
+
 void Planet::set_pos_x(float PosX)
 {
     pos_x = PosX;
@@ -72,6 +94,7 @@ void Planet::set_vel_y(float VelY)
 {
     vel_y = VelY;
 }
+
 void Planet::set_mass(float Mass)
 {
     mass = Mass;
@@ -81,4 +104,10 @@ void Planet::set_filename(string FileName)
 {
     filename = FileName;
 }
+
+void Planet::set_sprite(sf::Sprite Sprite)
+{
+    sprite = Sprite;
+}
+
 

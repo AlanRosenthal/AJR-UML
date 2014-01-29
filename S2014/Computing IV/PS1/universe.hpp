@@ -29,11 +29,11 @@ class Universe {
     void set_num_planets(int);
     void set_delta_time(float);
     void set_time(float);
-    void add_planets(Planet);
+    void push_planets(Planet);
 
     //Member Functions
+    void move_planet(Planet &p1, Planet &p2);
     void move_all_planets();
-    void move_planet(Planet p1, Planet p2);
 
     private:
     
