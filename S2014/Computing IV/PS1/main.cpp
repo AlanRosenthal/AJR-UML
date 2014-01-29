@@ -36,6 +36,7 @@ int main(int argc, char* argv[])
             file >> mass;
             file >> filename;
             Planet p(pos_x,pos_y,vel_x,vel_y,mass,filename);
+            universe.add_planets(p);
         }
         file.close();
     }

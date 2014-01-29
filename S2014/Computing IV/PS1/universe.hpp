@@ -29,9 +29,12 @@ class Universe {
     void set_num_planets(int);
     void set_delta_time(float);
     void set_time(float);
+    void add_planets(Planet);
 
-    //Functions
+    //Member Functions
+    void move_all_planets();
     void move_planet(Planet p1, Planet p2);
+
     private:
     
     float universe_size;

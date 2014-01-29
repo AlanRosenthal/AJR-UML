@@ -1,5 +1,6 @@
 #include "universe.hpp"
 
+//Constructors
 Universe::Universe()
 {
     universe_size = 0.0;
@@ -13,6 +14,7 @@ Universe::~Universe()
 
 }
 
+//Accessors
 float Universe::get_universe_size() const
 {
     return universe_size;
@@ -33,6 +35,7 @@ float Universe::get_time() const
     return time;
 }
 
+//Mutators
 void Universe::set_universe_size(float UniverseSize)
 {
     universe_size = UniverseSize;
@@ -53,6 +56,23 @@ void Universe::set_time(float Time)
     time = Time;
 }
 
+void Universe::add_planets(Planet new_planet)
+{
+    planets.push_back(new_planet);
+}
+void Universe::move_all_planets()
+{
+    for (vector<Planet>::iterator i = planets.begin(); i != planets.end(); ++i)
+    {
+        cout << i->get_filename() << endl;
+    }
+
+}
+
+
+
+
+//Member Functions
 void Universe::move_planet(Planet p1, Planet p2)
 {
     static float G = 6.67e-11;
