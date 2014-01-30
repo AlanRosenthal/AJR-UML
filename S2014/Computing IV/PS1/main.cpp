@@ -36,8 +36,6 @@ int main(int argc, char* argv[])
     }
     sf::RenderWindow window(sf::VideoMode(500,500),"Solar System");
     window.setFramerateLimit(60);
-    int go = 0;
-    
     while (window.isOpen())
     {
         sf::Event event;
