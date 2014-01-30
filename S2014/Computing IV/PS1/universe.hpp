@@ -32,9 +32,10 @@ class Universe {
     void push_planets(Planet);
 
     //Member Functions
-    void move_planet(Planet &p1, Planet &p2);
+    void move_planet(Planet *p1, Planet *p2);
     void move_all_planets();
     void draw_planet(sf::RenderWindow *window, Planet *p);
+    void draw_all_planets(sf::RenderWindow *window);
 
     private:
     

@@ -62,8 +62,9 @@ void Universe::push_planets(Planet new_planet)
 }
 
 //Member Functions
-void Universe::move_planet(Planet &p1, Planet &p2)
+void Universe::move_planet(Planet *p1, Planet *p2)
 {
+    /*
     static float G = 6.67e-11;
     float delta_x = p2.get_pos_x() - p1.get_pos_x();
     float delta_y = p2.get_pos_y() - p1.get_pos_y();
@@ -77,6 +78,37 @@ void Universe::move_planet(Planet &p1, Planet &p2)
     p1.set_vel_y(p1.get_vel_y() + delta_time*ay);
     p1.set_pos_x(p1.get_pos_x() + delta_time*p1.get_vel_x());
     p1.set_pos_y(p1.get_pos_y() + delta_time*p1.get_vel_y());
+    */
+    cout << "Planet " << p1->get_id() << " ->  " << p2->get_id() << ": " << endl;
+    float px = p1->get_pos_x();
+    float py = p1->get_pos_y();
+    float vx = p1->get_vel_x();
+    float vy = p1->get_vel_y();
+
+
+    static float G = 6.67e-11;
+    float m1 = p1->get_mass();
+    float m2 = p2->get_mass();
+    float delta_x = p2->get_pos_x() - p1->get_pos_x();
+    float delta_y = p2->get_pos_y() - p1->get_pos_y();
+    float r = sqrt(pow(delta_x,2) + pow(delta_y,2));
+    float F = (G*m1)*(m2/pow(r,2));
+    float Fx = (F*delta_x)/r;
+    float Fy = (F*delta_y)/r;
+    float ax = Fx/m1;
+    float ay = Fy/m1;
+    cout << "delta_x: " << delta_x << ", delta_y: " << delta_y << ", F: " << F << ", Fx: " << Fx << ", Fy: " << Fy << endl;
+        
+    p1->set_vel_x(p1->get_vel_x() + delta_time*ax);
+    p1->set_vel_y(p1->get_vel_y() + delta_time*ay);
+    p1->set_pos_x(p1->get_pos_x() + delta_time*p1->get_vel_x());
+    p1->set_pos_y(p1->get_pos_y() + delta_time*p1->get_vel_y());
+
+    float dpx = (p1->get_pos_x()) - px;
+    float dpy = (p1->get_pos_y()) - py;
+    float dvx = (p1->get_vel_x()) - vx;
+    float dvy = (p1->get_vel_y()) - vy;
+    cout << "dpx: " << dpx << ", dpy: " << dpy << ", dvx: " << dvx << ", dvy: " << dvy << endl;
 }
 
 void Universe::move_all_planets()
@@ -89,15 +121,30 @@ void Universe::move_all_planets()
             {
                 continue;
             }
-            move_planet(*i,*j);           
-            cout << i->get_filename() << " " << j->get_filename() << endl;
+            move_planet(&(*i),&(*j));
         }
     }
+    time = time + delta_time;
 }
 
 void Universe::draw_planet(sf::RenderWindow *window,Planet *p)
 {
     sf::Sprite *s = p->get_sprite();
+    sf::Texture tex;
+    tex.loadFromFile(p->get_filename());
+    s->setTexture(tex);
+    sf::Vector2u window_size = window->getSize();
+    float x = ((window_size.x / (universe_size*2)) * p->get_pos_x()*.25) + window_size.x/2;
+    float y = ((window_size.y / (universe_size*2)) * p->get_pos_y()*.25) + window_size.y/2;
+    s->setPosition(x,y);
+    //cout << p->get_filename() << ": x: " << x << ", y: " << y << endl;
     window->draw(*s);
+}
+void Universe::draw_all_planets(sf::RenderWindow *window)
+{
+    for (vector<Planet>::iterator i = planets.begin(); i != planets.end(); ++i)
+    {
+        draw_planet(&(*window),&(*i));
+    }
 }
 

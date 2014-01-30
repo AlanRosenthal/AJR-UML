@@ -10,6 +10,9 @@ int main(int argc, char* argv[])
 {
     Universe universe;
 
+    universe.set_time(0);
+    universe.set_delta_time(atof(argv[2]));
+    
     //read in file
     ifstream file(argv[3]);
     if (file.is_open())
@@ -27,7 +30,6 @@ int main(int argc, char* argv[])
         file >> universe_size;
         universe.set_num_planets(num_planets);
         universe.set_universe_size(universe_size);
-
         for (int i = 0; i < universe.get_num_planets(); i++)
         {
             file >> pos_x;
@@ -36,14 +38,13 @@ int main(int argc, char* argv[])
             file >> vel_y;
             file >> mass;
             file >> filename;
-            Planet p(i,pos_x,pos_y,vel_x,vel_y,mass,filename);
+            Planet p = Planet(i,pos_x,pos_y,vel_x,vel_y,mass,filename);
             universe.push_planets(p);
         }
         file.close();
     }
-    sf::RenderWindow window(sf::VideoMode(500,500),"Solar System");
+    sf::RenderWindow window(sf::VideoMode(750,750),"Solar System");
     window.setFramerateLimit(60);
-    Planet test_planet(0,10,11,20,21,100,"nbody/earth.gif");
     while (window.isOpen())
     {
         sf::Event event;
@@ -51,11 +52,18 @@ int main(int argc, char* argv[])
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            if (event.type == sf::Event::KeyPressed)
+            {
+                universe.move_all_planets();
+               
+            }
         }
         window.clear();
-        //window.draw(sprite);
-        //universe.move_all_planets();
-        universe.draw_planet(&window,&test_planet);
+        
+        //universe.move_all_planets(); 
+        universe.draw_all_planets(&window);
+        
+        
         window.display();
     }
     return 0;

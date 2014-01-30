@@ -46,7 +46,6 @@ class Planet {
 	float mass;
 	string filename;
     sf::Sprite sprite;
-    sf::Texture texture;
 };
 
 #endif

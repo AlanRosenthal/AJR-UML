@@ -20,10 +20,6 @@ Planet::Planet(int ID, float PosX, float PosY, float VelX, float VelY, float Mas
     vel_y = VelY;
     mass = Mass;
     filename = FileName;
-    cout << texture.loadFromFile(filename) << endl;
-    sprite.setTexture(texture);
-    cout << "Setting Texture!!!  " << mass << endl;
-    sprite.setPosition(10,10);
 }
 
 Planet::~Planet()
