@@ -172,10 +172,11 @@ void Universe::draw_planet(sf::RenderWindow *window,Planet *p)
     tex.loadFromFile(p->get_filename());
     s->setTexture(tex);
     sf::Vector2u window_size = window->getSize();
-    float x = ((window_size.x / (universe_size*2)) * p->get_pos_x()) + window_size.x/2;
-    float y = ((window_size.y / (universe_size*2)) * p->get_pos_y()) + window_size.y/2;
+    sf::Vector2u tex_size = tex.getSize();
+    
+    float x = ((window_size.x / (universe_size*2)) * p->get_pos_x()) + window_size.x/2 - tex_size.x/2;
+    float y = ((window_size.y / (universe_size*2)) * p->get_pos_y()) + window_size.y/2 - tex_size.y/2;
     s->setPosition(x,y);
-    //cout << p->get_filename() << ": x: " << x << ", y: " << y << endl;
     window->draw(*s);
 }
 void Universe::draw_all_planets(sf::RenderWindow *window)

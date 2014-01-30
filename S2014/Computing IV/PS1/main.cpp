@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
         Planet p = Planet(i,pos_x,pos_y,vel_x,vel_y,mass,filename);
         universe.push_planets(p);
     }
-    sf::RenderWindow window(sf::VideoMode(750,750),"Solar System");
+    sf::RenderWindow window(sf::VideoMode(500,500),"Solar System");
     window.setFramerateLimit(60);
     int go = 0;
     
