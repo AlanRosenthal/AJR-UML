@@ -79,13 +79,6 @@ void Universe::move_planet(Planet *p1, Planet *p2)
     p1.set_pos_x(p1.get_pos_x() + delta_time*p1.get_vel_x());
     p1.set_pos_y(p1.get_pos_y() + delta_time*p1.get_vel_y());
     */
-    cout << "Planet " << p1->get_id() << " ->  " << p2->get_id() << ": " << endl;
-    float px = p1->get_pos_x();
-    float py = p1->get_pos_y();
-    float vx = p1->get_vel_x();
-    float vy = p1->get_vel_y();
-
-
     static float G = 6.67e-11;
     float m1 = p1->get_mass();
     float m2 = p2->get_mass();
@@ -95,24 +88,51 @@ void Universe::move_planet(Planet *p1, Planet *p2)
     float F = (G*m1)*(m2/pow(r,2));
     float Fx = (F*delta_x)/r;
     float Fy = (F*delta_y)/r;
+    p1->add_to_force_x(Fx);
+    p1->add_to_force_y(Fy);
+    /*
+    
+    
     float ax = Fx/m1;
     float ay = Fy/m1;
-    cout << "delta_x: " << delta_x << ", delta_y: " << delta_y << ", F: " << F << ", Fx: " << Fx << ", Fy: " << Fy << endl;
-        
-    p1->set_vel_x(p1->get_vel_x() + delta_time*ax);
-    p1->set_vel_y(p1->get_vel_y() + delta_time*ay);
-    p1->set_pos_x(p1->get_pos_x() + delta_time*p1->get_vel_x());
-    p1->set_pos_y(p1->get_pos_y() + delta_time*p1->get_vel_y());
-
-    float dpx = (p1->get_pos_x()) - px;
-    float dpy = (p1->get_pos_y()) - py;
-    float dvx = (p1->get_vel_x()) - vx;
-    float dvy = (p1->get_vel_y()) - vy;
-    cout << "dpx: " << dpx << ", dpy: " << dpy << ", dvx: " << dvx << ", dvy: " << dvy << endl;
+    float dvx = delta_time*ax;
+    float dvy = delta_time*ay;
+    cout << "id1: " << p1->get_id() << endl;
+    cout << "id2: " << p2->get_id() << endl;
+    cout << "m1: " << m1 << endl;
+    cout << "m2: " << m2 << endl;
+    cout << "delta_x: " << delta_x << endl;
+    cout << "delta_y: " << delta_y << endl;
+    cout << "r: " << r << endl;
+    cout << "F: " << F << endl;
+    cout << "Fx: " << Fx << endl;
+    cout << "Fy: " << Fy << endl;
+    cout << "ax: " << ax << endl;
+    cout << "ay: " << ay << endl;
+    
+    p1->add_new_vel_x(dvx);
+    p1->add_new_vel_y(dvy);
+    p1->add_new_pos_x(delta_time*(p1->get_vel_x() + dvx));
+    p1->add_new_pos_y(delta_time*(p1->get_vel_y() + dvy));
+    //cout << p1->get_id() << ": " << Fx << ", " << Fy << "; " << p1->get_new_pos_x() << ", " << p1->get_new_pos_y() << "; " << p1->get_new_vel_x() << ", " << p1->get_new_vel_y() << endl;
+    */
 }
 
 void Universe::move_all_planets()
 {
+    //set forces to 0
+    for (vector<Planet>::iterator i = planets.begin(); i != planets.end(); ++i)
+    {
+        i->set_force_x(0.0);
+        i->set_force_y(0.0);
+/*
+        i->set_new_pos_x(0);
+        i->set_new_pos_y(0);
+        i->set_new_vel_x(0);
+        i->set_new_vel_y(0);
+*/
+    }
+    //calculate superposition forces
     for (vector<Planet>::iterator i = planets.begin(); i != planets.end(); ++i)
     {
         for (vector<Planet>::iterator j = planets.begin(); j != planets.end(); ++j)
@@ -124,6 +144,24 @@ void Universe::move_all_planets()
             move_planet(&(*i),&(*j));
         }
     }
+    //apply superpositions
+    for (vector<Planet>::iterator i = planets.begin(); i != planets.end(); ++i)
+    {
+        float ax = (i->get_force_x()) / (i->get_mass());
+        float ay = (i->get_force_y()) / (i->get_mass());
+        float vx = (i->get_vel_x()) + delta_time*ax;
+        float vy = (i->get_vel_y()) + delta_time*ay;
+        i->set_vel_x(vx);
+        i->set_vel_y(vy);
+        float px = (i->get_pos_x()) + delta_time*vx;
+        float py = (i->get_pos_y()) + delta_time*vy;
+        i->set_pos_x(px);
+        i->set_pos_y(py);
+/*        i->add_pos_x(i->get_new_pos_x());
+        i->add_pos_y(i->get_new_pos_y());
+        i->add_vel_x(i->get_new_vel_x());
+        i->add_vel_y(i->get_new_vel_y());*/
+    }
     time = time + delta_time;
 }
 
@@ -134,8 +172,8 @@ void Universe::draw_planet(sf::RenderWindow *window,Planet *p)
     tex.loadFromFile(p->get_filename());
     s->setTexture(tex);
     sf::Vector2u window_size = window->getSize();
-    float x = ((window_size.x / (universe_size*2)) * p->get_pos_x()*.25) + window_size.x/2;
-    float y = ((window_size.y / (universe_size*2)) * p->get_pos_y()*.25) + window_size.y/2;
+    float x = ((window_size.x / (universe_size*2)) * p->get_pos_x()) + window_size.x/2;
+    float y = ((window_size.y / (universe_size*2)) * p->get_pos_y()) + window_size.y/2;
     s->setPosition(x,y);
     //cout << p->get_filename() << ": x: " << x << ", y: " << y << endl;
     window->draw(*s);

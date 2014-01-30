@@ -9,6 +9,8 @@ Planet::Planet()
     vel_x = 0.0;
     vel_y = 0.0;
     mass = 0.0;
+    force_x = 0.0;
+    force_y = 0.0;
 }
 
 Planet::Planet(int ID, float PosX, float PosY, float VelX, float VelY, float Mass, string FileName)
@@ -20,6 +22,8 @@ Planet::Planet(int ID, float PosX, float PosY, float VelX, float VelY, float Mas
     vel_y = VelY;
     mass = Mass;
     filename = FileName;
+    force_x = 0.0;
+    force_y = 0.0;
 }
 
 Planet::~Planet()
@@ -50,6 +54,16 @@ float Planet::get_vel_x() const
 float Planet::get_vel_y() const
 {
     return vel_y;
+}
+
+float Planet::get_force_x() const
+{
+    return force_x;
+}
+
+float Planet::get_force_y() const
+{
+    return force_y;
 }
 
 float Planet::get_mass() const
@@ -93,6 +107,26 @@ void Planet::set_vel_y(float VelY)
     vel_y = VelY;
 }
 
+void Planet::set_force_x(float ForceX)
+{
+    force_x = ForceX;
+}
+
+void Planet::set_force_y(float ForceY)
+{
+    force_y = ForceY;
+}
+
+void Planet::add_to_force_x(float ForceX)
+{
+    force_x += ForceX;
+}
+
+void Planet::add_to_force_y(float ForceY)
+{
+    force_y += ForceY;
+}
+
 void Planet::set_mass(float Mass)
 {
     mass = Mass;
@@ -107,5 +141,3 @@ void Planet::set_sprite(sf::Sprite* Sprite)
 {
     sprite = *Sprite;
 }
-
-
