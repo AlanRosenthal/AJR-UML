@@ -64,21 +64,6 @@ void Universe::push_planets(Planet new_planet)
 //Member Functions
 void Universe::move_planet(Planet *p1, Planet *p2)
 {
-    /*
-    static float G = 6.67e-11;
-    float delta_x = p2.get_pos_x() - p1.get_pos_x();
-    float delta_y = p2.get_pos_y() - p1.get_pos_y();
-    float r = sqrt(pow(delta_x,2)+pow(delta_y,2));
-    float F = G*(p1.get_mass()*p2.get_mass())/(pow(r,2));
-    float Fx = F*delta_x/r;
-    float Fy = F*delta_y/r;
-    float ax = Fx/p1.get_mass();
-    float ay = Fy/p1.get_mass();
-    p1.set_vel_x(p1.get_vel_x() + delta_time*ax);
-    p1.set_vel_y(p1.get_vel_y() + delta_time*ay);
-    p1.set_pos_x(p1.get_pos_x() + delta_time*p1.get_vel_x());
-    p1.set_pos_y(p1.get_pos_y() + delta_time*p1.get_vel_y());
-    */
     static float G = 6.67e-11;
     float m1 = p1->get_mass();
     float m2 = p2->get_mass();
@@ -90,32 +75,6 @@ void Universe::move_planet(Planet *p1, Planet *p2)
     float Fy = (F*delta_y)/r;
     p1->add_to_force_x(Fx);
     p1->add_to_force_y(Fy);
-    /*
-    
-    
-    float ax = Fx/m1;
-    float ay = Fy/m1;
-    float dvx = delta_time*ax;
-    float dvy = delta_time*ay;
-    cout << "id1: " << p1->get_id() << endl;
-    cout << "id2: " << p2->get_id() << endl;
-    cout << "m1: " << m1 << endl;
-    cout << "m2: " << m2 << endl;
-    cout << "delta_x: " << delta_x << endl;
-    cout << "delta_y: " << delta_y << endl;
-    cout << "r: " << r << endl;
-    cout << "F: " << F << endl;
-    cout << "Fx: " << Fx << endl;
-    cout << "Fy: " << Fy << endl;
-    cout << "ax: " << ax << endl;
-    cout << "ay: " << ay << endl;
-    
-    p1->add_new_vel_x(dvx);
-    p1->add_new_vel_y(dvy);
-    p1->add_new_pos_x(delta_time*(p1->get_vel_x() + dvx));
-    p1->add_new_pos_y(delta_time*(p1->get_vel_y() + dvy));
-    //cout << p1->get_id() << ": " << Fx << ", " << Fy << "; " << p1->get_new_pos_x() << ", " << p1->get_new_pos_y() << "; " << p1->get_new_vel_x() << ", " << p1->get_new_vel_y() << endl;
-    */
 }
 
 void Universe::move_all_planets()
@@ -125,12 +84,6 @@ void Universe::move_all_planets()
     {
         i->set_force_x(0.0);
         i->set_force_y(0.0);
-/*
-        i->set_new_pos_x(0);
-        i->set_new_pos_y(0);
-        i->set_new_vel_x(0);
-        i->set_new_vel_y(0);
-*/
     }
     //calculate superposition forces
     for (vector<Planet>::iterator i = planets.begin(); i != planets.end(); ++i)
@@ -157,10 +110,6 @@ void Universe::move_all_planets()
         float py = (i->get_pos_y()) + delta_time*vy;
         i->set_pos_x(px);
         i->set_pos_y(py);
-/*        i->add_pos_x(i->get_new_pos_x());
-        i->add_pos_y(i->get_new_pos_y());
-        i->add_vel_x(i->get_new_vel_x());
-        i->add_vel_y(i->get_new_vel_y());*/
     }
     time = time + delta_time;
 }
