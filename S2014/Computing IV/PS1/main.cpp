@@ -45,14 +45,10 @@ int main(int argc, char* argv[])
         {
             if (event.type == sf::Event::Closed)
                 window.close();
-            if (event.type == sf::Event::KeyPressed)
-            {
-            
-            }
         }
         window.clear();
         
-        universe.move_all_planets(); 
+        universe.update(); 
         universe.draw_all_planets(&window);
         
         

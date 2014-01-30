@@ -62,7 +62,7 @@ void Universe::push_planets(Planet new_planet)
 }
 
 //Member Functions
-void Universe::move_planet(Planet *p1, Planet *p2)
+void Universe::calc_force(Planet *p1, Planet *p2)
 {
     static float G = 6.67e-11;
     float m1 = p1->get_mass();
@@ -76,8 +76,7 @@ void Universe::move_planet(Planet *p1, Planet *p2)
     p1->add_to_force_x(Fx);
     p1->add_to_force_y(Fy);
 }
-
-void Universe::move_all_planets()
+void Universe::calc_forces()
 {
     //set forces to 0
     for (vector<Planet>::iterator i = planets.begin(); i != planets.end(); ++i)
@@ -94,9 +93,12 @@ void Universe::move_all_planets()
             {
                 continue;
             }
-            move_planet(&(*i),&(*j));
+            calc_force(&(*i),&(*j));
         }
     }
+}
+void Universe::apply_forces()
+{
     //apply superpositions
     for (vector<Planet>::iterator i = planets.begin(); i != planets.end(); ++i)
     {
@@ -111,6 +113,12 @@ void Universe::move_all_planets()
         i->set_pos_x(px);
         i->set_pos_y(py);
     }
+}
+
+void Universe::update()
+{
+    calc_forces();
+    apply_forces();
     time = time + delta_time;
 }
 
