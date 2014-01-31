@@ -1,7 +1,7 @@
-all: solarsystem
+all: nbody/solarsystem
 
-solarsystem: main.o universe.o planet.o
-	g++ main.o universe.o planet.o -o solarsystem -lsfml-graphics -lsfml-window -lsfml-system
+nbody/solarsystem: main.o universe.o planet.o
+	g++ main.o universe.o planet.o -o nbody/solarsystem -lsfml-graphics -lsfml-window -lsfml-system
 
 main.o: main.cpp
 	g++ -c main.cpp universe.hpp planet.hpp
@@ -13,4 +13,4 @@ planet.o: planet.cpp
 	g++ -c planet.cpp planet.hpp
 
 clean:
-	rm -rf *.o *.gch solarsystem
+	rm -rf *.o *.gch nbody/solarsystem
