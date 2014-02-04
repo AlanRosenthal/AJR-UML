@@ -15,21 +15,20 @@ class Triangle {
 
     //Accessors
     sf::ConvexShape* get_triangle();
+    sf::Vector2f get_p0() const;
+    sf::Vector2f get_p1() const;
+    sf::Vector2f get_p2() const;
 
     //Mutators
 
-
-//    private:
-
+    private:
     
-    sf::Vector2f left_triangle;
-    sf::Vector2f right_triangle;
-    sf::Vector2f top_triangle;
-    double radius;
     sf::ConvexShape triangle;
     sf::Vector2f p0;
     sf::Vector2f p1;
     sf::Vector2f p2;
 };
+
+
 
 #endif

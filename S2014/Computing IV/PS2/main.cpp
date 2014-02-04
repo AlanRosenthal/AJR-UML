@@ -1,23 +1,29 @@
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include "triangle.hpp"
+#include "sierpinski.hpp"
 #include <iostream>
 
 using namespace std;
 
-
-void create_triangle_right(sf::ConvexShape* polygon, sf::Vector2f point, double radius);
-
+void draw_all(sf::RenderWindow *window,Sierpinski *sierpinski);
+void recurse(Sierpinski *sierpinski,int depth);
 
 int main(int argc, char* argv[])
 {
-    sf::RenderWindow window(sf::VideoMode(500,500),"Solar System");
-    window.setFramerateLimit(60);
+    if (argc < 3)
+    {
+        cout << "triangle [recursion depth] [side length]" << endl;
+        return -1;
+    }
+    int depth = atoi(argv[1]);
+    int side = atof(argv[2]);
 
-    Triangle triangle(sf::Vector2f(0,0),sf::Vector2f(400,0),sf::Vector2f(200,0.5*400*sqrt(3)));
-    cout << triangle.left_triangle.x << ", " << triangle.left_triangle.y << endl;
-    cout << triangle.right_triangle.x << ", " << triangle.right_triangle.y << endl;
-    cout << triangle.top_triangle.x << ", " << triangle.top_triangle.y << endl;
+    Sierpinski sierpinski(side);
+    recurse(&sierpinski,depth);
+    
+    sf::RenderWindow window(sf::VideoMode(700,700),"Solar System");
+    window.setFramerateLimit(60);
     while(window.isOpen())
     {
         sf::Event event;
@@ -27,23 +33,27 @@ int main(int argc, char* argv[])
                 window.close();
         }
         window.clear();
-        window.draw(*triangle.get_triangle());
+        draw_all(&window,&sierpinski);
         window.display();
     }
     return 0;
 }
-
-void create_triangle_right(sf::ConvexShape* polygon, sf::Vector2f point, double radius)
+void draw_all(sf::RenderWindow *window,Sierpinski *sierpinski)
 {
-    double x = 0;
-    double y = 0;//point.y;
-    polygon->setPointCount(3);
-    polygon->setPoint(0,point);
-    polygon->setPoint(1,sf::Vector2f(x+radius,y));
-    polygon->setPoint(2,sf::Vector2f(x+radius/2,y+0.5*radius*sqrt(3)));
-    polygon->setFillColor(sf::Color::Black);
-    polygon->setOutlineColor(sf::Color::Yellow);
-    polygon->setOutlineThickness(1);
-    polygon->setPosition(10, 10); 
+    if (sierpinski == 0) return;
+    Triangle *base = sierpinski->get_base();
+    window->draw(*base->get_triangle());
+    draw_all(&(*window),sierpinski->get_child0());
+    draw_all(&(*window),sierpinski->get_child1());
+    draw_all(&(*window),sierpinski->get_child2());
 }
 
+void recurse(Sierpinski *sierpinski,int depth)
+{
+    if (depth == 0) return;
+    depth--;
+    sierpinski->create_children();
+    recurse(sierpinski->get_child0(),depth);
+    recurse(sierpinski->get_child1(),depth);
+    recurse(sierpinski->get_child2(),depth);
+}
