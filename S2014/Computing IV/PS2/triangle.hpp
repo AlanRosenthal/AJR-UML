@@ -3,7 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 
-class Triangle { 
+class Triangle : public sf::Drawable
+{ 
     public:
 
     //Constructor
@@ -14,12 +15,14 @@ class Triangle {
     ~Triangle();
 
     //Accessors
-    sf::ConvexShape* get_triangle();
     sf::Vector2f get_p0() const;
     sf::Vector2f get_p1() const;
     sf::Vector2f get_p2() const;
 
     //Mutators
+
+    //Overloaded Function
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
     private:
     

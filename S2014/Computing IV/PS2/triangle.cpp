@@ -14,6 +14,7 @@ Triangle::Triangle()
     triangle.setOutlineThickness(1);
     triangle.setPosition(0,0);
 }
+
 Triangle::Triangle(sf::Vector2f Point0,sf::Vector2f Point1,sf::Vector2f Point2)
 {
     p0 = Point0;
@@ -34,11 +35,6 @@ Triangle::~Triangle()
 
 }
 
-sf::ConvexShape* Triangle::get_triangle()
-{
-    return &triangle;
-}
-
 sf::Vector2f Triangle::get_p0() const
 {
     return p0;
@@ -52,5 +48,10 @@ sf::Vector2f Triangle::get_p1() const
 sf::Vector2f Triangle::get_p2() const
 {
     return p2;
+}
+
+void Triangle::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+    target.draw(triangle);
 }
 
