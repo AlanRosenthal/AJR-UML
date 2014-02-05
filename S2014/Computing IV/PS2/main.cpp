@@ -6,8 +6,6 @@
 
 using namespace std;
 
-void recurse(Sierpinski *sierpinski,int depth);
-
 int main(int argc, char* argv[])
 {
     if (argc < 3)
@@ -18,7 +16,6 @@ int main(int argc, char* argv[])
     int depth = atoi(argv[1]);
     int side = atof(argv[2]);
     Sierpinski sierpinski(side, depth);
-    
     sf::RenderWindow window(sf::VideoMode(700,700),"Solar System");
     window.setFramerateLimit(60);
     while(window.isOpen())
