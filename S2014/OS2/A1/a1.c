@@ -9,7 +9,7 @@
 #define INIT 1
 #define STACKSIZE (10000)
 
-typedef struct  state_block
+typedef struct state_block
 {
     int state;
     void (*function)(int);
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     int i,j,k;
     struct itimerval quantum;
     struct sigaction sigdat;
-
+    
     for(i=0; i<N; i++)
     {
         t_state[i].state = FREE;
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     sigemptyset(&maskval);
     sigdat.sa_handler = clock_isr;
     sigemptyset(&sigdat.sa_mask);
-    sigdat.sa_flags =  SA_RESTART;
+    sigdat.sa_flags = SA_RESTART;
 
     if(sigaction(SIGVTALRM, &sigdat, (struct sigaction *)0) == -1)
     {
@@ -90,12 +90,12 @@ int main(int argc, char *argv[])
     }
     while(1);
     return 0;
-}   /****** End main() ******/
+}
 
 int t_init (void (*fun_addr)(), int fun_arg)
 {
     int i,j,k;
-
+    //finds an empty slot
     for (i=1; i<N; i++)
     {
         if (t_state[i].state == FREE) break;
@@ -124,7 +124,7 @@ int t_init (void (*fun_addr)(), int fun_arg)
 
     return(i);
 
-}   /****** End t_init() ******/
+}
 
 void clock_isr(int sig)
 {
@@ -172,7 +172,7 @@ void clock_isr(int sig)
         exit(0);
     }
     return;
-} /****** End clock_isr ******/
+}
 
 void fun1 (int global_index)
 {
