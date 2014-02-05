@@ -29,7 +29,7 @@ int bx[10];
 
 void fun1(int), fun2(int), fun3(int), clock_isr(int);
 int t_init(void (*)(), int);
-
+void returncontext(void);
 
 int main(int argc, char *argv[])
 {
@@ -82,7 +82,6 @@ int main(int argc, char *argv[])
         perror("setitimer");
         exit(3);
     }
-
     if(setcontext(&(t_state[current].run_env)) == -1)
     {
         perror("setcontext");
@@ -101,6 +100,9 @@ int t_init (void (*fun_addr)(), int fun_arg)
         if (t_state[i].state == FREE) break;
     }
     if (i == N) return(-1);
+    
+//  t_state[i].rtn_env.uc_stack = (void *)(malloc(STACKSIZE));
+    //check malloc
 
     if(getcontext(&t_state[i].run_env) == -1)
     {
@@ -119,7 +121,10 @@ int t_init (void (*fun_addr)(), int fun_arg)
     t_state[i].mystk.ss_size = STACKSIZE;
     t_state[i].mystk.ss_flags = 0;
     t_state[i].run_env.uc_stack = t_state[i].mystk;
-
+    t_state[i].rtn_env.uc_stack = t_state[i].mystk;
+    getcontext(&t_state[i].rtn_env); 
+    makecontext(&t_state[i].rtn_env,returncontext,0);
+    t_state[i].run_env.uc_link = &t_state[i].rtn_env;
     makecontext(&t_state[i].run_env, fun_addr, 1,fun_arg);
 
     return(i);
@@ -185,7 +190,8 @@ void fun1 (int global_index)
         for (b=0, bx[global_index]=0; b<25000000; ++b,++bx[global_index]);
     }
     t_state[current].state = FREE;
-    clock_isr(-current);
+    //clock_isr(-current);
+//    printf("end of world\n");
     return;
 }
 
@@ -200,7 +206,7 @@ void fun2 (int global_index)
         for (b=0, bx[global_index]=0; b<18000000; ++b,++bx[global_index]);
     }
     t_state[current].state = FREE;
-    clock_isr(-current);
+    //clock_isr(-current);
     return;
 }
 
@@ -215,7 +221,13 @@ void fun3 (int global_index)
         for (b=0, bx[global_index]=0; b<40000000; ++b,++bx[global_index]);
     }
     t_state[current].state = FREE;
-    clock_isr(-current);
+    //clock_isr(-current);
     return;
+}
+
+void returncontext(void)
+{
+    printf("return context\n");
+    while(1);
 }
 
