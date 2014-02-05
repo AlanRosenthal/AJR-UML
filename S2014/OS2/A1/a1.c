@@ -92,7 +92,6 @@ int main(int argc, char *argv[])
     return 0;
 }   /****** End main() ******/
 
-
 int t_init (void (*fun_addr)(), int fun_arg)
 {
     int i,j,k;
@@ -126,9 +125,6 @@ int t_init (void (*fun_addr)(), int fun_arg)
     return(i);
 
 }   /****** End t_init() ******/
-
-
-
 
 void clock_isr(int sig)
 {
@@ -178,9 +174,6 @@ void clock_isr(int sig)
     return;
 } /****** End clock_isr ******/
 
-
-
-
 void fun1 (int global_index)
 {
     volatile int a=0, b=0;
@@ -195,8 +188,6 @@ void fun1 (int global_index)
     clock_isr(-current);
     return;
 }
-
-
 
 void fun2 (int global_index)
 {
@@ -213,8 +204,6 @@ void fun2 (int global_index)
     return;
 }
 
-
-
 void fun3 (int global_index)
 {
     volatile int a=0, b=0;
@@ -229,3 +218,4 @@ void fun3 (int global_index)
     clock_isr(-current);
     return;
 }
+
