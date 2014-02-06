@@ -225,7 +225,7 @@ void fun3 (int global_index)
 
 void returncontext(void)
 {
-    printf("return context\n");
-    while(1);
+    t_state[current].state = FREE;
+    clock_isr(-current);
 }
 
