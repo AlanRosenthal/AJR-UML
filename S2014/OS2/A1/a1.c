@@ -101,9 +101,6 @@ int t_init (void (*fun_addr)(), int fun_arg)
     }
     if (i == N) return(-1);
     
-//  t_state[i].rtn_env.uc_stack = (void *)(malloc(STACKSIZE));
-    //check malloc
-
     if(getcontext(&t_state[i].run_env) == -1)
     {
         perror("getcontext in t_init");
@@ -121,10 +118,11 @@ int t_init (void (*fun_addr)(), int fun_arg)
     t_state[i].mystk.ss_size = STACKSIZE;
     t_state[i].mystk.ss_flags = 0;
     t_state[i].run_env.uc_stack = t_state[i].mystk;
+    t_state[i].run_env.uc_link = &t_state[i].rtn_env;
+    //
     t_state[i].rtn_env.uc_stack = t_state[i].mystk;
     getcontext(&t_state[i].rtn_env); 
     makecontext(&t_state[i].rtn_env,returncontext,0);
-    t_state[i].run_env.uc_link = &t_state[i].rtn_env;
     makecontext(&t_state[i].run_env, fun_addr, 1,fun_arg);
 
     return(i);
@@ -189,7 +187,7 @@ void fun1 (int global_index)
         write (1,"1",1);
         for (b=0, bx[global_index]=0; b<25000000; ++b,++bx[global_index]);
     }
-    t_state[current].state = FREE;
+    //t_state[current].state = FREE;
     //clock_isr(-current);
 //    printf("end of world\n");
     return;
@@ -205,7 +203,7 @@ void fun2 (int global_index)
         write (1,"2",1);
         for (b=0, bx[global_index]=0; b<18000000; ++b,++bx[global_index]);
     }
-    t_state[current].state = FREE;
+//    t_state[current].state = FREE;
     //clock_isr(-current);
     return;
 }
@@ -220,7 +218,7 @@ void fun3 (int global_index)
         write (1,"3",1);
         for (b=0, bx[global_index]=0; b<40000000; ++b,++bx[global_index]);
     }
-    t_state[current].state = FREE;
+  //  t_state[current].state = FREE;
     //clock_isr(-current);
     return;
 }
