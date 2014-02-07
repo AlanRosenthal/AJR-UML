@@ -1,0 +1,53 @@
+[arosenth@mercury A1]$ ./a1
+thread IDs are 1    2   3
+	 from fun1 a = 0	b = 0
+1	 from fun1 a = 1	b = 25000000
+1	 from fun1 a = 2	b = 25000000
+1	 from fun1 a = 3	b = 25000000
+1	 from fun1 a = 4	b = 25000000
+1	 from fun1 a = 5	b = 25000000
+1	interrupt on context  1 
+					thread 1 has b = 9029671
+	 from fun2 a = 0	b = 0
+2	 from fun2 a = 1	b = 18000000
+2	 from fun2 a = 2	b = 18000000
+2	 from fun2 a = 3	b = 18000000
+2	 from fun2 a = 4	b = 18000000
+2	 from fun2 a = 5	b = 18000000
+2	 from fun2 a = 6	b = 18000000
+2	 from fun2 a = 7	b = 18000000
+2	interrupt on context  2 
+					thread 2 has b = 3447422
+	 from fun3 a = 0	b = 0
+3	 from fun3 a = 1	b = 40000000
+3	 from fun3 a = 2	b = 40000000
+3	 from fun3 a = 3	b = 40000000
+3	interrupt on context  3 
+					thread 3 has b = 6370607
+	 from fun1 a = 6	b = 25000000
+1	 from fun1 a = 7	b = 25000000
+1	 from fun1 a = 8	b = 25000000
+1	 from fun1 a = 9	b = 25000000
+1	call in from context  1 
+***** Thread 1 has FINISHED
+	 from fun2 a = 8	b = 18000000
+2	interrupt on context  2 
+					thread 2 has b = 2891894
+	 from fun3 a = 4	b = 40000000
+3	 from fun3 a = 5	b = 40000000
+3	 from fun3 a = 6	b = 40000000
+3	interrupt on context  3 
+					thread 3 has b = 17168898
+	 from fun2 a = 9	b = 18000000
+2	call in from context  2 
+***** Thread 2 has FINISHED
+	 from fun3 a = 7	b = 40000000
+3	 from fun3 a = 8	b = 40000000
+3	 from fun3 a = 9	b = 40000000
+3	interrupt on context  3 
+					thread 3 has b = 3989755
+	call in from context  3 
+***** Thread 3 has FINISHED
+no more threads left,  EXITING FROM clock_isr NOW
+
+

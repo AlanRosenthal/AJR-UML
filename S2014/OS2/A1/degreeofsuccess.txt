@@ -1,0 +1,11 @@
+Alan Rosenthal
+Alan.Rosenthal@gmail.com
+
+Degree of Success:
+100%
+
+Brief discussion of my approach:
+I made a function named returncontext.  I set the uc_link field to the context which contained the returncontext function for fuctions fun1,fun2,fun3.  When they returned, returncontext was called, which triggered a timer interrupt.
+
+Detailed description of any problems I was not able to solve:
+N/A
