@@ -11,11 +11,11 @@ Triangle::Triangle()
     triangle.setPoint(2,p2);
     triangle.setFillColor(sf::Color::Transparent);
     triangle.setOutlineColor(sf::Color::Yellow);
-    triangle.setOutlineThickness(1);
+    triangle.setOutlineThickness(-1);
     triangle.setPosition(0,0);
 }
 
-Triangle::Triangle(sf::Vector2f Point0,sf::Vector2f Point1,sf::Vector2f Point2)
+Triangle::Triangle(sf::Vector2f Point0,sf::Vector2f Point1,sf::Vector2f Point2,sf::Color FillColor)
 {
     p0 = Point0;
     p1 = Point1;
@@ -24,9 +24,9 @@ Triangle::Triangle(sf::Vector2f Point0,sf::Vector2f Point1,sf::Vector2f Point2)
     triangle.setPoint(0,p0);
     triangle.setPoint(1,p1);
     triangle.setPoint(2,p2);
-    triangle.setFillColor(sf::Color::Transparent);
+    triangle.setFillColor(FillColor);
     triangle.setOutlineColor(sf::Color::Yellow);
-    triangle.setOutlineThickness(1);
+    triangle.setOutlineThickness(-1);
     triangle.setPosition(0,0);
 }
 

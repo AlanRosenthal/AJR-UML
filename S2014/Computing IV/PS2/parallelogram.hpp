@@ -1,23 +1,24 @@
-#ifndef TRIANGLE_HPP
-#define TRIANGLE_HPP
+#ifndef PARALLELOGRAM_HPP
+#define PARALLELOGRAM_HPP
 
 #include <SFML/Graphics.hpp>
 
-class Triangle : public sf::Drawable
+class Parallelogram : public sf::Drawable
 { 
     public:
 
     //Constructor
-    Triangle();
-    Triangle(sf::Vector2f,sf::Vector2f,sf::Vector2f,sf::Color);
+    Parallelogram();
+    Parallelogram(sf::Vector2f,sf::Vector2f,sf::Vector2f,sf::Vector2f,sf::Color);
 
     //Destructor
-    ~Triangle();
+    ~Parallelogram();
 
     //Accessors
     sf::Vector2f get_p0() const;
     sf::Vector2f get_p1() const;
     sf::Vector2f get_p2() const;
+    sf::Vector2f get_p3() const;
 
     //Mutators
 
@@ -26,10 +27,11 @@ class Triangle : public sf::Drawable
 
     private:
     
-    sf::ConvexShape triangle;
+    sf::ConvexShape parallelogram;
     sf::Vector2f p0;
     sf::Vector2f p1;
     sf::Vector2f p2;
+    sf::Vector2f p3;
 };
 
 

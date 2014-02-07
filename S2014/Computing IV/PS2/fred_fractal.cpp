@@ -10,11 +10,11 @@ int main(int argc, char* argv[])
 {
     if (argc < 3)
     {
-        cout << "triangle [recursion depth] [side length]" << endl;
+        cout << argv[0] <<" [side lenght] [recursion depth]" << endl;
         return -1;
     }
-    int depth = atoi(argv[1]);
-    int side = atof(argv[2]);
+    int depth = atoi(argv[2]);
+    int side = atof(argv[1]);
     Sierpinski sierpinski(side, depth);
     sf::RenderWindow window(sf::VideoMode(700,700),"Solar System");
     window.setFramerateLimit(60);

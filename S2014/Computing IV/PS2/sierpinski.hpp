@@ -25,6 +25,7 @@ class Sierpinski : public sf::Drawable
 
     private:
     Triangle base;
+    Triangle* filled;
     Sierpinski* child0;
     Sierpinski* child1;
     Sierpinski* child2;

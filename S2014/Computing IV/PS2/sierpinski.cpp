@@ -1,6 +1,6 @@
 #include "sierpinski.hpp"
 #include <cmath>
-
+#include <SFML/System/Vector2.hpp>
 Sierpinski::Sierpinski()
 {
     base = Triangle();
@@ -11,18 +11,25 @@ Sierpinski::Sierpinski()
 
 Sierpinski::Sierpinski(sf::Vector2f Point0,sf::Vector2f Point1,sf::Vector2f Point2,int Depth)
 {
-    base = Triangle(Point0,Point1,Point2);
+    base = Triangle(Point0,Point1,Point2,sf::Color::Transparent);
+    filled = 0;
     child0 = 0;
     child1 = 0;
     child2 = 0;
-    if (Depth == 0) return;
+    if (Depth <= 0) return;
     Depth--;
     sf::Vector2f p0 = Point0;
     sf::Vector2f p1 = Point1;
     sf::Vector2f p2 = Point2;
+    sf::Vector2f p01 = (p0 * 0.5f) + (p1 * 0.5f); 
+    sf::Vector2f p02 = (p0 * 0.5f) + (p2 * 0.5f);
+    sf::Vector2f p12 = (p1 * 0.5f) + (p2 * 0.5f);
+/* 
     sf::Vector2f p01 = sf::Vector2f(p1.x + abs(p0.x-p1.x)/2,p0.y + abs(p1.y - p0.y)/2);
     sf::Vector2f p02 = sf::Vector2f(p0.x + abs(p2.x-p0.x)/2,p0.y + abs(p2.y - p0.y)/2);
     sf::Vector2f p12 = sf::Vector2f(p1.x + abs(p2.x-p1.x)/2,p1.y + abs(p2.y - p1.y)/2);
+ */
+    filled = new Triangle(p01,p02,p12,sf::Color::Yellow);
     child0 = new Sierpinski(p0,p01,p02,Depth);
     child1 = new Sierpinski(p01,p1,p12,Depth);
     child2 = new Sierpinski(p02,p12,p2,Depth);
@@ -44,6 +51,7 @@ Sierpinski::~Sierpinski()
 void Sierpinski::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     target.draw(base);
+    if (filled != 0) target.draw(*filled);
     if (child0 == 0) return;
     target.draw(*child0);
     target.draw(*child1);
