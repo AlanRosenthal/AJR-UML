@@ -1,0 +1,23 @@
+
+
+		PLEASE READ CAREFULLY
+
+this directory contains the sources from the text book
+with minor modifications to support compilation on
+a LINUX type system ... much of the source treats
+pointers as 16 bit objects as they are in the PDP-11
+... while an int on the PDP-11 is the same size as a
+short which is the same size as an address, this is
+not the case on most modern machines ... I have edited
+the code to at least compile on 32 bit machines where
+an int is the same size as an address, but if you use
+the CS Dept. 64 bit Linux systems where an int is 32 bits
+but an address is 64 bits you will have many compile
+problems that you'll have to fix based on size 
+incompatabilities ... these sources will compile successfully,
+but there is no Makefile here, since these sources will
+have to be modified and supplemented by you to get a
+working version for assignments 2 and 3 ... you should 
+construct your own Makefile when you have completed the
+modifications and additions/deletions you need to build
+a version of the system.
