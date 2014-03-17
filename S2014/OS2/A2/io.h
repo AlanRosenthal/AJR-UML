@@ -5,12 +5,13 @@
 #define	INTVECO	outint		/* output interrupt dispatch routine	*/
 extern	int	INTVECI();
 extern	int	INTVECO();
+extern  void	ioint();
 
 struct	intmap	{		/* device-to-interrupt routine mapping	*/
-	int	(*iin)();	/* address of input interrupt routine	*/
-	int	icode;		/* argument passed to input routine	*/
-	int	(*iout)();	/* address of output interrupt routine	*/
-	int	ocode;		/* argument passed to output routine	*/
+	void	(*iin)();	/* address of input interrupt routine	*/
+	void	*icode;		/* argument passed to input routine	*/
+	void	(*iout)();	/* address of output interrupt routine	*/
+	void	*ocode;		/* argument passed to output routine	*/
 };
 
 #ifdef	NDEVS

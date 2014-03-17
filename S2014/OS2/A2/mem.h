@@ -4,8 +4,8 @@
  * roundew, truncew - round or truncate address to next even word
  *----------------------------------------------------------------------
  */
-#define	roundew(x)	(int )( (3 + (int)(x)) & (~3) )
-#define	truncew(x)	(int )( ((int)(x)) & (~3) )
+#define	roundew(x)	(int )( (7 + (int)(x)) & (~7) )
+#define	truncew(x)	(int )( ((int)(x)) & (~7) )
 
 /*----------------------------------------------------------------------
  *  freestk  --  free stack memory allocated by getstk

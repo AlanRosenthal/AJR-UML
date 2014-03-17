@@ -14,12 +14,14 @@ struct	devsw	{			/* device table entry */
 	int	(*dvgetc)();
 	int	(*dvputc)();
 	int	(*dvcntl)();
-	int	dvcsr;
+//	int	dvcsr;
+	struct csr	*dvcsr;
 	int	dvivec;
 	int	dvovec;
-	int	(*dviint)();
-	int	(*dvoint)();
-	char	*dvioblk;
+// 	int	(*dviint)();
+	void	(*dviint)();
+	void	(*dvoint)();
+	void	*dvioblk;
 	int	dvminor;
 	};
 
@@ -40,13 +42,16 @@ extern	struct	devsw devtab[];		/* one entry per device */
 
 /* Control block sizes */
 
+/************************************************************
 #define	Ntty	2
 #define	Ndlc	2
 #define	Ndsk	1
 #define	Ndf	4
 
 #define	NDEVS	9
-
+************************************************************/
+#define	Ntty	1
+#define	NDEVS	1
 /* Declarations of I/O routines referenced */
 
 extern	int	ttyinit();
@@ -57,9 +62,11 @@ extern	int	ttywrite();
 extern	int	ioerr();
 extern	int	ttycntl();
 extern	int	ttygetc();
-extern	int	ttyputc(struct devsw *, char);
+extern	int 	ttyputc(struct devsw *, char);
 extern	int	ttyiin();
 extern	int	ttyoin();
+
+/*************************************************
 extern	int	dlcinit();
 extern	int	dlcread();
 extern	int	dlcwrite();
@@ -81,12 +88,13 @@ extern	int	lfwrite();
 extern	int	lfseek();
 extern	int	lfgetc();
 extern	int	lfputc();
+**************************************************/
 
 /* Configuration and Size Constants */
 
 
-#define	MEMMARK				/* define if memory marking used*/
-#define NNETS	    1			/* number of XINU ring networks */
+// #define MEMMARK				/* define if memory marking used*/
+// #define NNETS	    1			/* number of XINU ring networks */
 					/* (remove if there are 0)      */
 #define	NPROC	    10			/* number of user processes	*/
 #define	NSEM	    50			/* number of semaphores		*/
