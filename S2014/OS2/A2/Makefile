@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -g -c -I. -I/usr/lib/gcc/i686-redhat-linux/4.4.4/include
 CXX_CFLAGS = -I.
 LDFLAGS=
-SOURCES = chprio.c clkinit.c create.c  freemem.c getitem.c getmem.c \
+SOURCES = chprio.c clkinit.c clkint.c create.c ctxsw.c freemem.c getitem.c getmem.c \
 getpid.c getprio.c getstk.c initialize.c insert.c insertd.c kill.c newqueue.c queue.c \
 ready.c receive.c recvclr.c resched.c resume.c screate.c sdelete.c send.c signal.c \
 sleep10.c sleep.c ssclock.c suspend.c userret.c wait.c wakeup.c
