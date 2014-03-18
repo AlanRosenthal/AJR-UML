@@ -1,4 +1,4 @@
-CC = gcc
+CC = perl colorgcc.pl
 CFLAGS = -g -c -I. -I/usr/lib/gcc/i686-redhat-linux/4.4.4/include
 CXX_CFLAGS = -I.
 LDFLAGS=
