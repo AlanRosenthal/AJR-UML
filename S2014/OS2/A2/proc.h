@@ -33,7 +33,8 @@
 struct	pentry	{
 	char	pstate;			/* process state: PRCURR, etc.	*/
 	int	pprio;			/* process priority		*/
-//	short	pregs[PNREGS];		/* saved regs. R0-R5,SP,PC,PS	*/
+//TODO
+	short	pregs[PNREGS];		/* saved regs. R0-R5,SP,PC,PS	*/
 	int	psem;			/* semaphore if process waiting	*/
 	int	pmsg;			/* message sent to this process	*/
 	Bool	phasmsg;		/* True iff pmsg is valid	*/

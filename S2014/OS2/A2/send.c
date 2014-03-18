@@ -11,7 +11,7 @@
 SYSCALL	send(int pid, int msg)
 {
 	struct	pentry	*pptr;		/* receiver's proc. table addr.	*/
-	char	ps;
+    sigset_t ps;
 
 	disable(ps);
 	if (isbadpid(pid) || ( (pptr= &proctab[pid])->pstate == PRFREE)

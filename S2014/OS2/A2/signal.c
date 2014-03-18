@@ -13,7 +13,7 @@
 SYSCALL signal(register int sem)
 {
 	register struct	sentry	*sptr;
-	char	ps;
+	sigset_t ps;
 
 	disable(ps);
 	if (isbadsem(sem) || (sptr= &semaph[sem])->sstate==SFREE) {

@@ -71,8 +71,7 @@ LOCAL	kputc(int device,
  */
 LOCAL	savestate(int device)
 {
-	char ps;
-
+    sigset_t ps;
 	disable(ps);
 	saveps = ps;
 	savedev = device;
@@ -91,7 +90,7 @@ LOCAL	savestate(int device)
  */
 LOCAL	rststate()
 {
-	char ps;
+	sigset_t ps;
 
 	((struct csr *)devtab[savedev].dvcsr)->crstat = savecrstat;
 	((struct csr *)devtab[savedev].dvcsr)->ctstat = savectstat;

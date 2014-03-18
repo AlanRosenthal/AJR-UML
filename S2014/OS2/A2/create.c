@@ -25,7 +25,7 @@ SYSCALL create( int *procaddr,	/* procedure address            */
 	int	i;
 	int	*a;			/* points to list of args	*/
 	int	*saddr;			/* stack address		*/
-	char	ps;			/* saved processor status	*/
+	sigset_t ps;			/* saved processor status	*/
 	int	INITRET();
 	disable(ps);
 	ssize = roundew(ssize);

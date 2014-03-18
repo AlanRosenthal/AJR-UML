@@ -9,12 +9,15 @@
 #include <tty.h>
 #include <q.h>
 #include <io.h>
-#include <disk.h>
-#include <network.h>
+//#include <disk.h>
+//#include <network.h>
 
 extern	int	main();			/* address of user's main prog	*/
 
 /* Declarations of major kernel variables */
+
+
+LOCAL sysinit();
 
 struct	pentry	proctab[NPROC]; /* process table			*/
 int	nextproc;		/* next process slot to use in create	*/
@@ -61,7 +64,7 @@ char	vers[] = VERSION;	/* Xinu version printed at startup	*/
 int nulluser()				/* babysit CPU when no one home */
 {
 	int	userpid;
-	char	ps;
+	sigset_t ps;
 
 	kprintf("\n\nXinu Version %s", vers);
 	if (reboot++ < 1)
@@ -76,8 +79,9 @@ int nulluser()				/* babysit CPU when no one home */
 	enable();			/* enable interrupts */
 
 	/* create a process to execute the user's main program */
-
-	userpid = create(main,INITSTK,INITPRIO,INITNAME,INITARGS);
+    //TODO 
+	//userpid = create(main,INITSTK,INITPRIO,INITNAME,INITARGS); //was
+	userpid = create(main,INITSTK,INITPRIO,INITNAME,INITARG);
 
 #ifdef	NETDAEMON
 	/* start the network input daemon process */

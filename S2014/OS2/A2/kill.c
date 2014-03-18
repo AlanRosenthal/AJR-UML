@@ -14,7 +14,7 @@
 SYSCALL kill(int pid)			/* process to kill              */
 {
 	struct	pentry	*pptr;		/* points to proc. table for pid*/
-	char	ps;
+	sigset_t ps;
 
 	disable(ps);
 	if (isbadpid(pid) || (pptr= &proctab[pid])->pstate==PRFREE) {
