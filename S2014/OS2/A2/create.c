@@ -41,7 +41,7 @@ SYSCALL create( int *procaddr,	/* procedure address            */
 	for (i=0 ; i<PNMLEN && (pptr->pname[i]=name[i])!=0 ; i++)
 		;
 	pptr->pprio = priority;
-	pptr->pbase = saddr;
+	pptr->pbase = (int) saddr;
 	pptr->pstklen = ssize;
 	pptr->psem = 0;
 	pptr->phasmsg = FALSE;

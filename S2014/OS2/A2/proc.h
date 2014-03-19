@@ -38,7 +38,7 @@ struct	pentry	{
     int	psem;			/* semaphore if process waiting	*/
 	int	pmsg;			/* message sent to this process	*/
 	Bool	phasmsg;		/* True iff pmsg is valid	*/
-	int * pbase;			/* base of run time stack	*/
+	int pbase;			/* base of run time stack	*/
 	int	pstklen;		/* stack length			*/
 	int	plimit;			/* lowest extent of stack	*/
 	char	pname[PNMLEN];		/* process name			*/

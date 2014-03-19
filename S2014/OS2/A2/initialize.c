@@ -87,11 +87,11 @@ int main(int argc,char * argv[])                /* babysit CPU when no one home 
     makecontext(&end_game_ctxt, end_game, 0);
 
 
-    enable();           /* enable interrupts */
+//    enable();           /* enable interrupts */
 
     /* create a process to execute the user's main program */
     userpid = create(xmain,INITSTK,INITPRIO,INITNAME,INITARGC,1);
-
+    setcontext(&(proctab[NULLPROC].posix_ctxt));
 //no network
 //#ifdef    NETDAEMON
 //  /* start the network input daemon process */
@@ -99,7 +99,7 @@ int main(int argc,char * argv[])                /* babysit CPU when no one home 
 //    create(NETIN, NETISTK, NETIPRI, NETINAM, NETIARGC, userpid)
 //  );
 //#else
-    resume( userpid );
+  //  resume( userpid );
 //#endif
 
     while (TRUE) {          /* run forever without actually */
@@ -116,7 +116,7 @@ sigset_t full_block;
 sigset_t full_unblock;
 
 
-LOCAL   sysinit()
+LOCAL sysinit(void)
 {
     int i;
     struct  pentry  *pptr;
@@ -133,9 +133,16 @@ LOCAL   sysinit()
     nextsem  = NSEM-1;
     nextqueue= NPROC;       /* q[0..NPROC-1] are processes */
 
-    memlist.mnext = mptr =  (struct mblock *) roundew(&end); /* initialize free memory list */ 
+//    memlist.mnext = mptr =  (struct mblock *) roundew(&end); /* initialize free memory list */ 
+    memlist.mnext = mptr = (struct mblock *) malloc(FREE_SIZE);
+    if (mptr == NULL)
+    {
+        perror("malloc failed ");
+        exit(3);
+    }
     mptr->mnext = (struct mblock *)NULL;
-    mptr->mlen = truncew((unsigned)maxaddr-NULLSTK-(unsigned)&end);
+//    mptr->mlen = truncew((unsigned)maxaddr-NULLSTK-(unsigned)&end);
+    mptr->mlen =truncew((FREE_SIZE)-(NULLSTK));
 
     for (i=0 ; i<NPROC ; i++)   /* initialize process table */
         proctab[i].pstate = PRFREE;
@@ -144,9 +151,11 @@ LOCAL   sysinit()
     pptr->pstate = PRCURR;
     pptr->pprio = 0;
     strcpy(pptr->pname, "prnull");
-    pptr->plimit = ( (int)maxaddr ) - NULLSTK - sizeof(int);
-    pptr->pbase = maxaddr;
-    *(pptr->pbase) = MAGIC;
+//    pptr->plimit = ( (int)maxaddr ) - NULLSTK - sizeof(int);
+    pptr->plimit = ((int)mptr + (FREE_SIZE) - (NULLSTK) -1);
+//    pptr->pbase = (int) maxaddr;
+    pptr->pbase = (int)mptr + (FREE_SIZE) - 1;
+    *((int *)pptr->pbase) = MAGIC;
     pptr->paddr = (void*) idle_thread;
     pptr->phasmsg = FALSE;
     pptr->pargs = 0;
