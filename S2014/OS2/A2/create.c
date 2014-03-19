@@ -41,21 +41,25 @@ SYSCALL create( int *procaddr,	/* procedure address            */
 	for (i=0 ; i<PNMLEN && (pptr->pname[i]=name[i])!=0 ; i++)
 		;
 	pptr->pprio = priority;
-	pptr->pbase = (int)saddr;
+	pptr->pbase = saddr;
 	pptr->pstklen = ssize;
 	pptr->psem = 0;
 	pptr->phasmsg = FALSE;
 	pptr->plimit = (int)(saddr - ssize + 1);
 	pptr->pargs = nargs;
-	for (i=0 ; i<PNREGS ; i++)
-		pptr->pregs[i]=INITREG;
-	pptr->pregs[PC] = pptr->paddr = (int)procaddr;
-	pptr->pregs[PS] = INITPS;
+
+//	for (i=0 ; i<PNREGS ; i++)
+//		pptr->pregs[i]=INITREG;
+//	pptr->pregs[PC] = pptr->paddr = (int)procaddr;
+//	pptr->pregs[PS] = INITPS;
+
 	a = (&args) + (nargs-1);	/* point to last argument	*/
 	for ( ; nargs > 0 ; nargs--)	/* machine dependent; copy args	*/
 		*saddr-- = *a--;	/* onto created process' stack	*/
 	*saddr = (int)INITRET;		/* push on return address	*/
-	pptr->pregs[SP] = (int)saddr;
+
+//	pptr->pregs[SP] = (int)saddr;
+
 	restore(ps);
 	return(pid);
 }

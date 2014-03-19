@@ -8,6 +8,7 @@
  *  init  -  initialize a device
  *------------------------------------------------------------------------
  */
+int init(int);
 int init(int descrp)
 {
 	struct	devsw	*devptr;

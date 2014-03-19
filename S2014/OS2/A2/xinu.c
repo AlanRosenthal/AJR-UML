@@ -1,7 +1,13 @@
 #include "kernel.h"
 
+void xmain(int arg)
+{
+}
 
-sigset_t full_block;
-sigset_t full_unblock;
-void main(void);
+void end_game(void)
+{
+}
+void idle_thread(void)
+{
+}
 

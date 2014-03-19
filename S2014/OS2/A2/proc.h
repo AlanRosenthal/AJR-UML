@@ -33,12 +33,12 @@
 struct	pentry	{
 	char	pstate;			/* process state: PRCURR, etc.	*/
 	int	pprio;			/* process priority		*/
-//TODO
-	short	pregs[PNREGS];		/* saved regs. R0-R5,SP,PC,PS	*/
-	int	psem;			/* semaphore if process waiting	*/
+	//short	pregs[PNREGS];		/* saved regs. R0-R5,SP,PC,PS	*/
+	//TODO there should be a makecontext structure here
+    int	psem;			/* semaphore if process waiting	*/
 	int	pmsg;			/* message sent to this process	*/
 	Bool	phasmsg;		/* True iff pmsg is valid	*/
-	int	pbase;			/* base of run time stack	*/
+	int * pbase;			/* base of run time stack	*/
 	int	pstklen;		/* stack length			*/
 	int	plimit;			/* lowest extent of stack	*/
 	char	pname[PNMLEN];		/* process name			*/

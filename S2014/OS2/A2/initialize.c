@@ -9,43 +9,48 @@
 #include <tty.h>
 #include <q.h>
 #include <io.h>
+#include <string.h>
 //#include <disk.h>
 //#include <network.h>
 
-extern	int	main();			/* address of user's main prog	*/
-
+extern  int xmain();            /* address of user's main prog  */
+extern void end_game(void);
+extern void idle_thread(void);
 /* Declarations of major kernel variables */
 
 
 LOCAL sysinit();
 
-struct	pentry	proctab[NPROC]; /* process table			*/
-int	nextproc;		/* next process slot to use in create	*/
-struct	sentry	semaph[NSEM];	/* semaphore table			*/
-int	nextsem;		/* next semaphore slot to use in screate*/
-struct	qent	q[NQENT];	/* q table (see queue.c)		*/
-int	nextqueue;		/* next slot in q structure to use	*/
-int	*maxaddr;		/* max memory address (set by sizmem)	*/
-#ifdef	NDEVS
-struct	intmap	intmap[NDEVS];	/* interrupt dispatch table		*/
+struct  pentry  proctab[NPROC]; /* process table            */
+int nextproc;       /* next process slot to use in create   */
+struct  sentry  semaph[NSEM];   /* semaphore table          */
+int nextsem;        /* next semaphore slot to use in screate*/
+struct  qent    q[NQENT];   /* q table (see queue.c)        */
+int nextqueue;      /* next slot in q structure to use  */
+int *maxaddr;       /* max memory address (set by sizmem)   */
+#ifdef  NDEVS
+struct  intmap  intmap[NDEVS];  /* interrupt dispatch table     */
 #endif
-struct	mblock	memlist;	/* list of free memory blocks		*/
-#ifdef	Ntty
-struct  tty     tty[Ntty];	/* SLU buffers and mode control		*/
+struct  mblock  memlist;    /* list of free memory blocks       */
+#ifdef  Ntty
+struct  tty     tty[Ntty];  /* SLU buffers and mode control     */
 #endif
 
 /* active system status */
 
-int	numproc;		/* number of live user processes	*/
-int	currpid;		/* id of currently running process	*/
-int	reboot = 0;		/* non-zero after first boot		*/
+int numproc;        /* number of live user processes    */
+int currpid;        /* id of currently running process  */
+int reboot = 0;     /* non-zero after first boot        */
 
-int	rdyhead,rdytail;	/* head/tail of ready list (q indexes)	*/
-char	vers[] = VERSION;	/* Xinu version printed at startup	*/
+int rdyhead,rdytail;    /* head/tail of ready list (q indexes)  */
+char    vers[] = VERSION;   /* Xinu version printed at startup  */
+
+ucontext_t posix_ctxt_init, end_game_ctxt;
+
 
 /************************************************************************/
-/***				NOTE:				      ***/
-/***								      ***/
+/***                NOTE:                     ***/
+/***                                      ***/
 /***   This is where the system begins after the C environment has    ***/
 /***   been established.  Interrupts are initially DISABLED, and      ***/
 /***   must eventually be enabled explicitly.  This routine turns     ***/
@@ -54,104 +59,125 @@ char	vers[] = VERSION;	/* Xinu version printed at startup	*/
 /***   execute code that might cause it to be suspended, wait for a   ***/
 /***   semaphore, or put to sleep, or exit.  In particular, it must   ***/
 /***   not do I/O unless it uses kprintf for polled output.           ***/
-/***								      ***/
+/***                                      ***/
 /************************************************************************/
 
 /*------------------------------------------------------------------------
  *  nulluser  -- initialize system and become the null process (id==0)
  *------------------------------------------------------------------------
  */
-int nulluser()				/* babysit CPU when no one home */
+int main(int argc,char * argv[])                /* babysit CPU when no one home */
 {
-	int	userpid;
-	sigset_t ps;
+    int userpid;
+    sigset_t ps;
+    write(1,"STARTING XINU...\n",17);
 
-	kprintf("\n\nXinu Version %s", vers);
-	if (reboot++ < 1)
-		kprintf("\n");
-	else
-		kprintf("   (reboot %d)\n", reboot);
-	sysinit();			/* initialize all of Xinu */
-	kprintf("%u real mem\n",(unsigned)maxaddr+(unsigned)sizeof(int));
-	kprintf("%u avail mem\n",
-		(unsigned)maxaddr-(unsigned)(&end)+(unsigned)sizeof(int));
-	kprintf("clock %sabled\n\n", clkruns==1?"en":"dis");
-	enable();			/* enable interrupts */
+    if (getcontext(&posix_ctxt_init) == -1)
+    {
+        perror("getcontext failed in initalize.c ");
+        exit(5);
+    }
 
-	/* create a process to execute the user's main program */
-    //TODO 
-	//userpid = create(main,INITSTK,INITPRIO,INITNAME,INITARGS); //was
-	userpid = create(main,INITSTK,INITPRIO,INITNAME,INITARG);
+    sysinit();          /* initialize all of Xinu */
 
-#ifdef	NETDAEMON
-	/* start the network input daemon process */
-	resume(
-	  create(NETIN, NETISTK, NETIPRI, NETINAM, NETIARGC, userpid)
-	);
-#else
-	resume( userpid );
-#endif
+    end_game_ctxt = posix_ctxt_init;
+    end_game_ctxt.uc_stack.ss_sp = (void*)((int)getstk(MINSTK)-MINSTK+1);
+    end_game_ctxt.uc_stack.ss_size = MINSTK;
+    end_game_ctxt.uc_stack.ss_flags = 0;
+    makecontext(&end_game_ctxt, end_game, 0);
 
-	while (TRUE) {			/* run forever without actually */
-		pause();		/*  executing instructions	*/
-	}
-	return;				/* unreachable			*/
+
+    enable();           /* enable interrupts */
+
+    /* create a process to execute the user's main program */
+    userpid = create(xmain,INITSTK,INITPRIO,INITNAME,INITARGC,1);
+
+//no network
+//#ifdef    NETDAEMON
+//  /* start the network input daemon process */
+//  resume(
+//    create(NETIN, NETISTK, NETIPRI, NETINAM, NETIARGC, userpid)
+//  );
+//#else
+    resume( userpid );
+//#endif
+
+    while (TRUE) {          /* run forever without actually */
+        pause();        /*  executing instructions  */
+    }
+    return;             /* unreachable          */
 }
 
 /*------------------------------------------------------------------------
  *  sysinit  --  initialize all Xinu data structures and devices
  *------------------------------------------------------------------------
  */
-LOCAL	sysinit()
+sigset_t full_block;
+sigset_t full_unblock;
+
+
+LOCAL   sysinit()
 {
-	int	i;
-	struct	pentry	*pptr;
-	struct	sentry	*sptr;
-	struct	mblock	*mptr;
+    int i;
+    struct  pentry  *pptr;
+    struct  sentry  *sptr;
+    struct  mblock  *mptr;
 
-	numproc  = 0;			/* initialize system variables */
-	nextproc = NPROC-1;
-	nextsem  = NSEM-1;
-	nextqueue= NPROC;		/* q[0..NPROC-1] are processes */
+    write(1,"INITIALIZING SYSTEM...\n",23);
+    //setup full block and full unblock
+    sigemptyset(&full_unblock);
+    sigfillset(&full_block);    
 
-	memlist.mnext = mptr =		/* initialize free memory list */
-	  (struct mblock *) roundew(&end);
-	mptr->mnext = (struct mblock *)NULL;
-	mptr->mlen = truncew((unsigned)maxaddr-NULLSTK-(unsigned)&end);
+    numproc  = 0;           /* initialize system variables */
+    nextproc = NPROC-1;
+    nextsem  = NSEM-1;
+    nextqueue= NPROC;       /* q[0..NPROC-1] are processes */
 
-	for (i=0 ; i<NPROC ; i++)	/* initialize process table */
-		proctab[i].pstate = PRFREE;
+    memlist.mnext = mptr =  (struct mblock *) roundew(&end); /* initialize free memory list */ 
+    mptr->mnext = (struct mblock *)NULL;
+    mptr->mlen = truncew((unsigned)maxaddr-NULLSTK-(unsigned)&end);
 
-	pptr = &proctab[NULLPROC];	/* initialize null process entry */
-	pptr->pstate = PRCURR;
-	pptr->pprio = 0;
-	strcpy(pptr->pname, "prnull");
-	pptr->plimit = ( (int)maxaddr ) - NULLSTK - sizeof(int);
-	pptr->pbase = maxaddr;
-	*( (int *)pptr->pbase ) = MAGIC;
-	pptr->paddr = nulluser;
-	pptr->phasmsg = FALSE;
-	pptr->pargs = 0;
-	currpid = NULLPROC;
+    for (i=0 ; i<NPROC ; i++)   /* initialize process table */
+        proctab[i].pstate = PRFREE;
 
-	for (i=0 ; i<NSEM ; i++) {	/* initialize semaphores */
-		(sptr = &semaph[i])->sstate = SFREE;
-		sptr->sqtail = 1 + (sptr->sqhead = newqueue());
-	}
+    pptr = &proctab[NULLPROC];  /* initialize null process entry */
+    pptr->pstate = PRCURR;
+    pptr->pprio = 0;
+    strcpy(pptr->pname, "prnull");
+    pptr->plimit = ( (int)maxaddr ) - NULLSTK - sizeof(int);
+    pptr->pbase = maxaddr;
+    *(pptr->pbase) = MAGIC;
+    pptr->paddr = (void*) idle_thread;
+    pptr->phasmsg = FALSE;
+    pptr->pargs = 0;
+    pptr->posix_ctxt = posix_ctxt_init;
 
-	rdytail = 1 + (rdyhead=newqueue());/* initialize ready list */
+    pptr->posix_ctxt.uc_stack.ss_sp = (void *)pptr->plimit;
+    pptr->posix_ctxt.uc_stack.ss_size = NULLSTK;
+    pptr->posix_ctxt.uc_stack.ss_flags = 0;
+    pptr->posix_ctxt.uc_link = &end_game_ctxt;
 
-#ifdef	MEMMARK
-	_mkinit();			/* initialize memory marking */
-#endif
-#ifdef	RTCLOCK
-	clkinit();			/* initialize r.t.clock	*/
-#endif
-#ifdef	Ndsk
-	dskdbp= mkpool(DBUFSIZ,NDBUFF);	/* initialize disk buffers */
-	dskrbp= mkpool(DREQSIZ,NDREQ);
-#endif
-	for ( i=0 ; i<NDEVS ; i++ )	/* initialize devices */
-		init(i);
-	return(OK);
+    makecontext(&(pptr->posix_ctxt),idle_thread,0);
+    currpid = NULLPROC;
+
+    for (i=0 ; i<NSEM ; i++) {  /* initialize semaphores */
+        (sptr = &semaph[i])->sstate = SFREE;
+        sptr->sqtail = 1 + (sptr->sqhead = newqueue());
+    }
+
+    rdytail = 1 + (rdyhead=newqueue());/* initialize ready list */
+
+//#ifdef    MEMMARK
+//  _mkinit();          /* initialize memory marking */
+//#endif
+//#ifdef    RTCLOCK
+    clkinit();          /* initialize r.t.clock */
+//#endif
+//#ifdef    Ndsk
+//  dskdbp= mkpool(DBUFSIZ,NDBUFF); /* initialize disk buffers */
+//  dskrbp= mkpool(DREQSIZ,NDREQ);
+//#endif
+    //for ( i=0 ; i<NDEVS ; i++ ) /* initialize devices */
+    //    init(i);
+    return(OK);
 }

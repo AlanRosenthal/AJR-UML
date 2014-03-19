@@ -6,7 +6,8 @@
 
 /* real-time clock variables and sleeping process queue pointers	*/
 
-#ifdef	RTCLOCK
+//#ifdef	RTCLOCK
+//there is a clock so we don't need this ifdef
 int	count6;			/* counts in 60ths of a second 6-0	*/
 int     defclk;			/* non-zero, then deferring clock count */
 int     clkdiff;		/* deferred clock ticks			*/
@@ -17,10 +18,10 @@ int     clockq;			/* head of queue of sleeping processes  */
 int	preempt;		/* preemption counter.	Current process */
 				/* is preempted when it reaches zero;	*/
 				/* set in resched; counts in ticks	*/
-int	clkruns;		/* set TRUE iff clock exists by setclkr	*/
-#else
-int	clkruns = FALSE;	/* no clock configured; be sure sleep	*/
-#endif				/*   doesn't wait forever		*/
+int	clkruns = TRUE;		/* set TRUE iff clock exists by setclkr	*/
+//#else
+//int	clkruns = FALSE;	/* no clock configured; be sure sleep	*/
+//#endif				/*   doesn't wait forever		*/
 
 /*
  *------------------------------------------------------------------------
@@ -29,12 +30,12 @@ int	clkruns = FALSE;	/* no clock configured; be sure sleep	*/
  */
 int clkinit()
 {
-	int *vector;
-
-	vector = (int *) CVECTOR;	/* set up interrupt vector	*/
-	*vector++ = clkint;
-	*vector = DISABLE;
-	setclkr();
+    //TODO set up interrupt vector
+	//int *vector;
+	//vector = (int *) CVECTOR;	/* set up interrupt vector	*/
+	//*vector++ = clkint;
+	//*vector = DISABLE;
+//	setclkr();
 	preempt = QUANTUM;		/* initial time quantum		*/
 	count6 = 6;			/* 60ths of a sec. counter	*/
 	slnempty = FALSE;		/* initially, no process asleep	*/

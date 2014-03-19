@@ -6,8 +6,10 @@
 
 
 
-void ctxsw(ucontext_t * a, ucontext_t * b)
+void ctxsw(ucontext_t * old, ucontext_t * new)
 {
+//    getcontext(old);
+//    swapcontext(new,old);
     //page 60
 
 
