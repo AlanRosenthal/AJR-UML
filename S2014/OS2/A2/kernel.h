@@ -29,17 +29,13 @@
 #define	LOWBYTE		0377		/* mask for low-order 8 bits	*/
 #define	HIBYTE		0177400		/* mask for high 8 of 16 bits	*/
 #define	LOW16		0177777		/* mask for low-order 16 bits	*/
-//TODO
-#define	SP		6		/* reg.	6 is stack pointer	*/
-//TODO
-#define	PC		7		/* reg.	7 is program counter	*/
-//TODO
-#define	PS		8		/* proc. status	in 8th reg. loc	*/
+//#define	SP		6		/* reg.	6 is stack pointer	*/
+//#define	PC		7		/* reg.	7 is program counter	*/
+//#define	PS		8		/* proc. status	in 8th reg. loc	*/
 #define	MINSTK		8192		/* minimum process stack size	*/
 #define	NULLSTK		8192		/* process 0 stack size		*/
 #define	MAXARGCNT	5		/* maximum int arguments to create	*/
-//TODO
-#define DISABLE 0
+//#define DISABLE 0
 // #define	DISABLE		0340		/* PS to disable interrupts	*/
 #define RTCLOCK
 #define FREE_SIZE	(1024*1024)
@@ -58,10 +54,8 @@
 #define	INITPRIO	20		/* initial process priority	*/
 #define	INITNAME	"m_fun"		/* initial process name		*/
 #define	INITRET		userret		/* processes return address	*/
-//TODO
-#define	INITPS		0		/* initial process PS		*/
-//TODO
-#define	INITREG		0		/* initial register contents	*/
+//#define	INITPS		0		/* initial process PS		*/
+//#define	INITREG		0		/* initial register contents	*/
 #define	QUANTUM		10		/* clock ticks until preemption	*/
 #define MAGIC		0xDEADBEEF	/* magic for nullproc stack base*/
 
