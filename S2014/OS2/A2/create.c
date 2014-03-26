@@ -5,6 +5,7 @@
 #include <proc.h>
 #include <mem.h>
 #include <io.h>
+#include <string.h>
 
 LOCAL newpid();
 
@@ -38,8 +39,7 @@ SYSCALL create( int *procaddr,	/* procedure address            */
 	numproc++;
 	pptr = &proctab[pid];
 	pptr->pstate = PRSUSP;
-	for (i=0 ; i<PNMLEN && (pptr->pname[i]=name[i])!=0 ; i++)
-		;
+    strcpy(pptr->pname,name);
 	pptr->pprio = priority;
 	pptr->pbase = (int) saddr;
 	pptr->pstklen = ssize;
@@ -47,17 +47,36 @@ SYSCALL create( int *procaddr,	/* procedure address            */
 	pptr->phasmsg = FALSE;
 	pptr->plimit = (int)(saddr - ssize + 1);
 	pptr->pargs = nargs;
-
+    
+    pptr->posix_ctxt = posix_ctxt_init;
+    pptr->posix_ctxt.uc_stack.ss_size = ssize;
+    pptr->posix_ctxt.uc_stack.ss_sp = saddr;
+    pptr->posix_ctxt.uc_stack.ss_flags = 0;
+    pptr->posix_ctxt.uc_link = &end_game_ctxt;
+    switch (nargs)
+    {
+        case 0:
+            makecontext(&(pptr->posix_ctxt),(void *)procaddr,0);
+            break;
+        case 1:
+            makecontext(&(pptr->posix_ctxt),(void *)procaddr,1,args);
+            break;
+        case 2:
+            makecontext(&(pptr->posix_ctxt),(void *)procaddr,2,args,*(&args+1));
+            break;
+        case 3:
+            makecontext(&(pptr->posix_ctxt),(void *)procaddr,3,args,*(&args+1),*(&args+1));
+            break;
+    }
 //	for (i=0 ; i<PNREGS ; i++)
 //		pptr->pregs[i]=INITREG;
 //	pptr->pregs[PC] = pptr->paddr = (int)procaddr;
 //	pptr->pregs[PS] = INITPS;
 
-	a = (&args) + (nargs-1);	/* point to last argument	*/
-	for ( ; nargs > 0 ; nargs--)	/* machine dependent; copy args	*/
-		*saddr-- = *a--;	/* onto created process' stack	*/
-	*saddr = (int)INITRET;		/* push on return address	*/
-
+//	a = (&args) + (nargs-1);	/* point to last argument	*/
+//	for ( ; nargs > 0 ; nargs--)	/* machine dependent; copy args	*/
+//		*saddr-- = *a--;	/* onto created process' stack	*/
+//	*saddr = (int)INITRET;		/* push on return address	*/
 //	pptr->pregs[SP] = (int)saddr;
 
 	restore(ps);

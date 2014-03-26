@@ -21,7 +21,7 @@
 /* miscellaneous process definitions */
 
 #define	PNREGS		9		/* size of saved register area	*/
-#define	PNMLEN		8		/* length of process "name"	*/
+#define	PNMLEN		15		/* length of process "name"	*/
 #define	NULLPROC	0		/* id of the null process; it	*/
 					/*  is always eligible to run	*/
 #define	BADPID		-1		/* used when invalid pid needed	*/
@@ -44,7 +44,7 @@ struct	pentry	{
 	char	pname[PNMLEN];		/* process name			*/
 	int	pargs;			/* initial number of arguments	*/
 	void	(*paddr)();		/* initial code address		*/
-	ucontext_t      posix_ctxt;	/* POSIX context struct		*/
+	ucontext_t posix_ctxt;	/* POSIX context struct		*/
 };
 
 extern void ctxsw(ucontext_t*, ucontext_t*);

@@ -35,11 +35,12 @@ int	resched()
 
 	nptr = &proctab[ (currpid = getlast(rdytail)) ];
 	nptr->pstate = PRCURR;		/* mark it currently running	*/
-#ifdef	RTCLOCK
+//#ifdef	RTCLOCK
 	preempt = QUANTUM;		/* reset preemption counter	*/
-#endif
+//#endif
 //	ctxsw(optr->pregs,nptr->pregs);
     //TODO
+    ctxsw(&(optr->posix_ctxt), &(nptr->posix_ctxt));
 
 	/* The OLD process returns here when resumed. */
 	return(OK);

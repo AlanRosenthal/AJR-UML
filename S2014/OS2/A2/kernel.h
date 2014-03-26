@@ -79,3 +79,4 @@ extern	int	rdyhead, rdytail;
 extern	int	preempt;
 extern  sigset_t full_block, full_unblock;
 extern  ucontext_t posix_ctxt_init, end_game_ctxt;
+extern int errno;

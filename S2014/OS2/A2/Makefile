@@ -7,7 +7,7 @@ getpid.c getprio.c getstk.c initialize.c insert.c insertd.c kill.c newqueue.c qu
 ready.c receive.c recvclr.c resched.c resume.c screate.c sdelete.c send.c signal.c \
 sleep10.c sleep.c ssclock.c suspend.c userret.c wait.c wakeup.c xinu.c
 OBJECTS = $(SOURCES:.c=.o)
-EXECUTABLE = xinu.exe
+EXECUTABLE = xinu
 
 
 all: $(SOURCES) $(EXECUTABLE)

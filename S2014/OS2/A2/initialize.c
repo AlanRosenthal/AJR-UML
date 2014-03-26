@@ -78,8 +78,9 @@ int main(int argc,char * argv[])                /* babysit CPU when no one home 
         exit(5);
     }
 
-    sysinit();          /* initialize all of Xinu */
+    sysinit(); // initialize all of Xinu 
 
+    //set up the edge of the world
     end_game_ctxt = posix_ctxt_init;
     end_game_ctxt.uc_stack.ss_sp = (void*)((int)getstk(MINSTK)-MINSTK+1);
     end_game_ctxt.uc_stack.ss_size = MINSTK;
@@ -159,13 +160,12 @@ LOCAL sysinit(void)
     pptr->paddr = (void*) idle_thread;
     pptr->phasmsg = FALSE;
     pptr->pargs = 0;
+    
     pptr->posix_ctxt = posix_ctxt_init;
-
     pptr->posix_ctxt.uc_stack.ss_sp = (void *)pptr->plimit;
     pptr->posix_ctxt.uc_stack.ss_size = NULLSTK;
     pptr->posix_ctxt.uc_stack.ss_flags = 0;
     pptr->posix_ctxt.uc_link = &end_game_ctxt;
-
     makecontext(&(pptr->posix_ctxt),idle_thread,0);
     currpid = NULLPROC;
 
