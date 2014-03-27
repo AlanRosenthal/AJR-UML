@@ -1,23 +1,27 @@
 #include <sleep.h>
 #include <kernel.h>
-
-void clkint(int notsure)
+#include <q.h>
+void printallqueue(int queue)
 {
-    write(1,"*",1);
-    
+    char tmp[100];
+    printf("\n");
+    while (queue != -1)
+    {
+        write(1,tmp,sprintf(tmp,"id: %d\tkey: %d\tqnext: %d\tqprev: %d\n",queue,q[queue].qkey,q[queue].qnext,q[queue].qprev));
+        queue = q[queue].qnext;
+    }
+}
+void clkint(int signal)
+{
     if (slnempty == TRUE)
     {
-        write(1,"&",1);
-        //decrement delta key on first process, if it calls 
+        if (q[q[clockq].qnext].qkey-- == 0)
+        {
+            wakeup();            
+        }
     }
     if (preempt-- == 0)
     {
-        write(1,"^",1);
-        //print out queue
         resched();
     }
-    
-    //TODO
-    //page 136
 }
-

@@ -25,3 +25,4 @@ extern	int	nextqueue;
 #define firstid(list)	(q[(list)].qnext)
 
 #define	EMPTY	-1		/* equivalent of null pointer		*/
+void printallqueue(int);

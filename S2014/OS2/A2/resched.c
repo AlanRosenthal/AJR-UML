@@ -17,6 +17,14 @@ int	resched()
 {
 	register struct	pentry	*optr;	/* pointer to old process entry */
 	register struct	pentry	*nptr;	/* pointer to new process entry */
+    int i;
+
+    //Calculate the number of processes running
+    numproc = 0;
+    for (i = 0;i < NPROC;i++)
+    {
+        if (proctab[i].pstate != PRFREE) numproc++;
+    }
 
 	/* no switch needed if current process priority higher than next*/
 
@@ -35,12 +43,8 @@ int	resched()
 
 	nptr = &proctab[ (currpid = getlast(rdytail)) ];
 	nptr->pstate = PRCURR;		/* mark it currently running	*/
-//#ifdef	RTCLOCK
 	preempt = QUANTUM;		/* reset preemption counter	*/
-//#endif
-//	ctxsw(optr->pregs,nptr->pregs);
-    //TODO
-    ctxsw(&(optr->posix_ctxt), &(nptr->posix_ctxt));
+    swapcontext(&(optr->posix_ctxt),&(nptr->posix_ctxt));
 
 	/* The OLD process returns here when resumed. */
 	return(OK);

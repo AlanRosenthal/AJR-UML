@@ -13,10 +13,10 @@ SYSCALL	suspend(int pid) 		/* id of process to suspend     */
 	struct	pentry	*pptr;		/* pointer to proc. tab. entry	*/
 	sigset_t ps;			/* saved processor status	*/
 	int	prio;			/* priority returned		*/
-
 	disable(ps);
-	if (isbadpid(pid) || pid==NULLPROC ||
-	 ((pptr= &proctab[pid])->pstate!=PRCURR && pptr->pstate!=PRREADY)) {
+    
+    pptr= &proctab[pid];
+	if ((isbadpid(pid)) || (pid==NULLPROC) || (pptr->pstate != PRCURR && pptr->pstate != PRREADY)) {
 		restore(ps);
 		return(SYSERR);
 	}

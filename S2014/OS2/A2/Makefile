@@ -2,7 +2,7 @@ CC = perl colorgcc.pl
 CFLAGS = -g -c -I. -I/usr/lib/gcc/i686-redhat-linux/4.4.4/include
 CXX_CFLAGS = -I.
 LDFLAGS=
-SOURCES = chprio.c clkinit.c clkint.c create.c ctxsw.c freemem.c getitem.c getmem.c \
+SOURCES = chprio.c clkinit.c clkint.c create.c freemem.c getitem.c getmem.c \
 getpid.c getprio.c getstk.c initialize.c insert.c insertd.c kill.c newqueue.c queue.c \
 ready.c receive.c recvclr.c resched.c resume.c screate.c sdelete.c send.c signal.c \
 sleep10.c sleep.c ssclock.c suspend.c userret.c wait.c wakeup.c xinu.c
@@ -106,33 +106,6 @@ create.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
 create.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
 create.o: /usr/include/alloca.h /usr/include/ucontext.h
 create.o: /usr/include/sys/ucontext.h ./proc.h ./mem.h ./io.h
-ctxsw.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
-ctxsw.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
-ctxsw.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
-ctxsw.o: /usr/include/bits/sigset.h /usr/include/bits/types.h
-ctxsw.o: /usr/include/bits/typesizes.h /usr/include/bits/signum.h
-ctxsw.o: /usr/include/time.h /usr/include/bits/siginfo.h
-ctxsw.o: /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h
-ctxsw.o: /usr/include/asm/sigcontext.h /usr/include/linux/types.h
-ctxsw.o: /usr/include/asm/types.h /usr/include/asm-generic/types.h
-ctxsw.o: /usr/include/asm-generic/int-ll64.h /usr/include/asm/bitsperlong.h
-ctxsw.o: /usr/include/asm-generic/bitsperlong.h
-ctxsw.o: /usr/include/linux/posix_types.h /usr/include/linux/stddef.h
-ctxsw.o: /usr/include/asm/posix_types.h /usr/include/asm/posix_types_32.h
-ctxsw.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stddef.h
-ctxsw.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
-ctxsw.o: /usr/include/bits/sigthread.h /usr/include/stdio.h
-ctxsw.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
-ctxsw.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stdarg.h
-ctxsw.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
-ctxsw.o: /usr/include/sys/time.h /usr/include/bits/time.h
-ctxsw.o: /usr/include/sys/select.h /usr/include/bits/select.h
-ctxsw.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
-ctxsw.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
-ctxsw.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
-ctxsw.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
-ctxsw.o: /usr/include/alloca.h /usr/include/ucontext.h
-ctxsw.o: /usr/include/sys/ucontext.h ./proc.h ./mem.h ./io.h
 freemem.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
 freemem.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
 freemem.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h

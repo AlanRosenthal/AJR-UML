@@ -91,18 +91,10 @@ int main(int argc,char * argv[])                /* babysit CPU when no one home 
 //    enable();           /* enable interrupts */
 
     /* create a process to execute the user's main program */
-    userpid = create(xmain,INITSTK,INITPRIO,INITNAME,INITARGC,1);
+    //userpid = create(xmain,INITSTK,INITPRIO,"xmain",INITARGC,1);
     setcontext(&(proctab[NULLPROC].posix_ctxt));
-//no network
-//#ifdef    NETDAEMON
-//  /* start the network input daemon process */
-//  resume(
-//    create(NETIN, NETISTK, NETIPRI, NETINAM, NETIARGC, userpid)
-//  );
-//#else
-  //  resume( userpid );
-//#endif
 
+    //unreachable
     while (TRUE) {          /* run forever without actually */
         pause();        /*  executing instructions  */
     }
@@ -151,7 +143,7 @@ LOCAL sysinit(void)
     pptr = &proctab[NULLPROC];  /* initialize null process entry */
     pptr->pstate = PRCURR;
     pptr->pprio = 0;
-    strcpy(pptr->pname, "prnull");
+    strcpy(pptr->pname, "idle_thread");
 //    pptr->plimit = ( (int)maxaddr ) - NULLSTK - sizeof(int);
     pptr->plimit = ((int)mptr + (FREE_SIZE) - (NULLSTK) -1);
 //    pptr->pbase = (int) maxaddr;
@@ -176,17 +168,6 @@ LOCAL sysinit(void)
 
     rdytail = 1 + (rdyhead=newqueue());/* initialize ready list */
 
-//#ifdef    MEMMARK
-//  _mkinit();          /* initialize memory marking */
-//#endif
-//#ifdef    RTCLOCK
     clkinit();          /* initialize r.t.clock */
-//#endif
-//#ifdef    Ndsk
-//  dskdbp= mkpool(DBUFSIZ,NDBUFF); /* initialize disk buffers */
-//  dskrbp= mkpool(DREQSIZ,NDREQ);
-//#endif
-    //for ( i=0 ; i<NDEVS ; i++ ) /* initialize devices */
-    //    init(i);
     return(OK);
 }

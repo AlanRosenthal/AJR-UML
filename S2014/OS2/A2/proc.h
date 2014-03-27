@@ -21,7 +21,7 @@
 /* miscellaneous process definitions */
 
 #define	PNREGS		9		/* size of saved register area	*/
-#define	PNMLEN		15		/* length of process "name"	*/
+#define	PNMLEN		20		/* length of process "name"	*/
 #define	NULLPROC	0		/* id of the null process; it	*/
 					/*  is always eligible to run	*/
 #define	BADPID		-1		/* used when invalid pid needed	*/
