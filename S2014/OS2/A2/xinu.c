@@ -3,11 +3,24 @@
 #include <sem.h>
 #include <q.h>
 
+void xmain(void);
 void end_game(void);
 void idle_thread(void);
 void procA(int);
 void procB(int,int);
 void procC(int,int);
+
+
+void xmain(void)
+{
+    char tmp[100];
+    int idle_thread_pid;
+    write(1,tmp,sprintf(tmp,"XMAIN: Starting PID %d...\n",getpid()));
+    idle_thread_pid = create(idle_thread,INITSTK,20,"idle_thread",0);
+    write(1,tmp,sprintf(tmp,"XMAIN: Created IDLE_THREAD (PID: %d)...\n",idle_thread_pid));
+    ready(idle_thread_pid,1);
+    while(numproc > 1) resched();
+}
 
 void end_game(void)
 {
@@ -27,22 +40,23 @@ void idle_thread(void)
     int procA_PID = create(procA,INITSTK,10,"procA",1,sem);
     int procB_PID = create(procB,INITSTK,10,"procB",2,sem,procA_PID);
     int procC_PID = create(procC,INITSTK,10,"procC",2,getpid(),30);
-    write(1,tmp,sprintf(tmp,"IDLE_THREAD: Created PROCA (pid: %d), PROCB (pid: %d), and PROCC (pid: %d)...\n",procA_PID,procB_PID,procC_PID));
+    write(1,tmp,sprintf(tmp,"IDLE_THREAD: Created A (PID: %d), B (PID: %d), and C (PID: %d)...\n",procA_PID,procB_PID,procC_PID));
     ready(procA_PID,0);
     ready(procB_PID,0);
     ready(procC_PID,0);
     
     //c. print a message saying that it is about to suspend itself 
     write(1,tmp,sprintf(tmp,"IDLE_THREAD: Suspending...\n"));
-    resched();
+    suspend(getpid());
+//    resched();
 //    suspend(getpid()); // cant suspend myself... why not?
 
     //d. print a message saying that it has been resumed 
     write(1,tmp,sprintf(tmp,"IDLE_THREAD: Resumed...\n"));
 
     //e. print a message saying that the process table is empty except for NULL and itself, and that it is now about to terminate the entire emulation 
-    while(numproc > 1) resched();
-    write(1,tmp,sprintf(tmp,"IDLE_THREAD: Process table is empty, Terminating...\n"));
+    write(1,tmp,sprintf(tmp,"IDLE_THREAD: Terminating...\n"));
+    //kill(getpid());
 }
 
 void procA(int sem)
@@ -64,7 +78,7 @@ void procA(int sem)
     //d. print a message saying that it has received a certain message and is now terminating itself    
     write(1,tmp,sprintf(tmp,"A: Message Received: %d\n",msg));
     write(1,tmp,sprintf(tmp,"A: Terminating...\n"));
-    kill(getpid());
+    //kill(getpid());
 }
 
 void procB(int sem, int pid_procA)
@@ -97,7 +111,7 @@ void procB(int sem, int pid_procA)
 
     //g. print a message saying that it is awake, and is now terminating itself
     write(1,tmp,sprintf(tmp,"B: Awakened. Terminating...\n"));
-    kill(getpid());
+    //kill(getpid());
 }
 
 void procC(int pid_idle_thread,int timeout)
@@ -113,11 +127,10 @@ void procC(int pid_idle_thread,int timeout)
 
     //c. print a message saying that it is awake, and is now resuming the INIT process (whose pid it was given as a create argument) 
     write(1,tmp,sprintf(tmp,"C: Awakened.  Resuming PID %d...\n",pid_idle_thread));
-    resched();
+    resume(pid_idle_thread);
 
     //d. print a message saying that it is now terminating itself 
     write(1,tmp,sprintf(tmp,"C: Terminating...\n"));
-    kill(getpid());
+    //kill(getpid());
 
 }
-

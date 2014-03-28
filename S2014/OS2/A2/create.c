@@ -33,8 +33,9 @@ SYSCALL create( int *procaddr,  /* procedure address            */
     pid = newpid();
     saddr = getstk(ssize);
 //    if ( ssize < MINSTK || (((int)(saddr=getstk(ssize))) == SYSERR ) || (pid=newpid()) == SYSERR || isodd(procaddr) || priority < 1 ) {
-    if ((ssize < MINSTK) || ((int) saddr  == SYSERR) || (pid == SYSERR) || (isodd(procaddr)) || (priority < 1)) {
-//    if ((ssize < MINSTK) || ((int) saddr  == SYSERR) || (pid == SYSERR) || (priority < 1)) {
+//    if ((ssize < MINSTK) || ((int) saddr  == SYSERR) || (pid == SYSERR) || (isodd(procaddr)) || (priority < 1)) {
+    if ((ssize < MINSTK) || ((int) saddr  == SYSERR) || (pid == SYSERR) || (priority < 1)) {
+        if ((int) saddr != SYSERR) freestk(saddr,ssize);
         restore(ps);
         return(SYSERR);
     }
@@ -52,9 +53,9 @@ SYSCALL create( int *procaddr,  /* procedure address            */
     
     pptr->posix_ctxt = posix_ctxt_init;
     pptr->posix_ctxt.uc_stack.ss_size = ssize;
-    pptr->posix_ctxt.uc_stack.ss_sp = saddr;
+    pptr->posix_ctxt.uc_stack.ss_sp = (void*)((int) saddr - ssize + 1);
     pptr->posix_ctxt.uc_stack.ss_flags = 0;
-    pptr->posix_ctxt.uc_link = &end_game_ctxt;
+    pptr->posix_ctxt.uc_link = &return_ctxt;
     switch (nargs)
     {
         case 0:
