@@ -1,5 +1,5 @@
 CC = perl colorgcc.pl
-CFLAGS = -g -c -I. 
+CFLAGS = -g -c -I. -I/usr/lib/gcc/x86_64-linux-gnu/4.6.3/include/
 CXX_CFLAGS = -I.
 LDFLAGS=
 SOURCES = codejam.c
@@ -23,9 +23,11 @@ depend:
 codejam.o: /usr/include/stdio.h /usr/include/features.h
 codejam.o: /usr/include/bits/predefs.h /usr/include/sys/cdefs.h
 codejam.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
-codejam.o: /usr/include/gnu/stubs-64.h /usr/include/bits/types.h
-codejam.o: /usr/include/bits/typesizes.h /usr/include/libio.h
-codejam.o: /usr/include/_G_config.h /usr/include/wchar.h
+codejam.o: /usr/include/gnu/stubs-64.h
+codejam.o: /usr/lib/gcc/x86_64-linux-gnu/4.6.3/include/stddef.h
+codejam.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
+codejam.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
+codejam.o: /usr/lib/gcc/x86_64-linux-gnu/4.6.3/include/stdarg.h
 codejam.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
 codejam.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
 codejam.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
