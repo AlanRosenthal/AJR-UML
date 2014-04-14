@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <float.h>
+#include <gc/gc.h>
 #include "codejam.h"
-void draw_mines(char minesweeper[],int row,int col,int mines);
+
+int draw_mines(char minesweeper[],int row,int col,int mines);
 void print_mines(char minesweeper[],int row,int col);
-int max(int a, int b);
-int min(int a, int b);
 
 int main(int argc, char * argv[])
 {
@@ -87,56 +87,102 @@ void solution(struct input_t * input)
     int pos = 0;
     int dir = 2; //1: right, 2: down, 3: right, 4: up
     char * minesweeper = malloc(sizeof(char)*input->R*input->C);
-    //malloc the size of output since it can be very large
-    draw_mines(minesweeper,input->R,input->C,input->M);
-    print_mines(minesweeper,input->R,input->C);
-    //free(minesweeper);
-    //input->output = malloc(sizeof(char)*10);
-    //sprintf(input->output,"test %d",input->id);
-    //input->output = malloc(sizeof(char)*input->R*input->C+input->R);
+    printf_int3(input->R,input->C,input->M);
+    switch (draw_mines(minesweeper,input->R,input->C,input->M))
+    {
+        case -1:
+            input->output = malloc(sizeof(char) * 20);
+            sprintf(input->output,"\nImpossible");
+            printf("Impossible\n");
+            break;
+        case 1:
+            print_mines(minesweeper,input->R,input->C);
+            break;
+    }
 }
-void draw_mines(char minesweeper[],int row,int col,int mines)
+int draw_mines(char minesweeper[],int row,int col,int mines)
 {
     int i,j;
+    int placed_mines = 0;
     int no_mines = row*col-mines;
+    int r,c;
+    switch (no_mines)
+    {
+        case 0:
+        case 2:
+        case 3:
+        case 5:
+        case 7:
+            return -1;//impossible
+    }
     for (i = 0;i < row;i++)
     {
         for (j = 0;j < col;j++)
         {
-            minesweeper[i*col+j] = 48;
+            minesweeper[i*col+j] = '.';
         }
     }
-    printf("r: %d, c:%d, m:%d\n",row,col,mines);
+    for (i = 0;i < row-2;i++)
+    {
+        for (j = 0;j < col-2;j++)
+        {
+            minesweeper[i*col+j] = '*';
+            placed_mines++;
+        }
+    }
+    //click spot in bottom corner
+    minesweeper[(row-1)*col+(col-1)] = 'c';
     
-    //for (PENIS = PENIS; PENIS > PENIS; PENIS ++)
-//     for (i = 0;i < max(row,col);i++)
-//     {
-//         for (j = 0;j < i;j++)
-//         {
-//             if ((i < col) && (j < row))
-//             {
-//                 if (no_mines-- > 0)
-//                     minesweeper[j*col+i] = '.';
-//                 else
-//                     minesweeper[j*col+i] = '*';
-//             }
-//             if ((j < col) && (i < row))
-//             {
-//                 if (no_mines-- > 0)
-//                     minesweeper[i*col+j] = '.';
-//                 else
-//                     minesweeper[i*col+j] = '*';
-//             }
-//         }
-//         if ((i < col) && (i < row))
-//         {
-//             if (no_mines-- > 0)
-//                 minesweeper[i*col+i] = '.';
-//             else
-//                 minesweeper[i*col+i] = '*';
-//         }
-//     }
-//    minesweeper[0] = 'c';
+    //set up inital values for r and c
+    if (placed_mines > mines)
+    {
+        r = row-3;
+        c = col-3;
+    } 
+    else
+    {
+        r = 0;
+        c = 0;
+    }
+    while(placed_mines != mines)
+    {
+//        printf_int4(row,col,mines,placed_mines);
+//        print_mines(minesweeper,row,col);
+        //added too many mines
+        if (placed_mines > mines)
+        {
+            minesweeper[col*r+c] = '.';
+            if (--c < 0)
+            {
+                r--;
+                c = col-3;
+            }
+            placed_mines--;
+        }
+        //didn't add enough mines
+        else
+        {
+            //add two mines
+            minesweeper[col*(row-2)+r] = '*';
+            minesweeper[col*(row-1)+r] = '*';
+            r++;
+            placed_mines+=2;
+            //should we add two more?
+            if ((placed_mines+2) <= mines)
+            {
+                minesweeper[col*c+(row-2)] = '*';
+                minesweeper[col*c+(row-1)] = '*';
+                c++;
+                placed_mines+=2;
+            }
+            //are we over by one?
+            if ((placed_mines+1) == mines)
+            {
+                minesweeper[(row-3)*col+col-3] = '.';
+            }
+        }
+    }
+    return 1;
 }
 void print_mines(char minesweeper[],int row,int col)
 {
@@ -151,13 +197,4 @@ void print_mines(char minesweeper[],int row,int col)
     }
     printf("\n");
 }
-int max(int a, int b)
-{
-    if (a > b) return a;
-    return b;
-}
-int min(int a, int b)
-{
-    if (a < b) return a;
-    return b;
-}
+
