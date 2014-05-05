@@ -19,7 +19,10 @@ void xmain(void)
     idle_thread_pid = create(idle_thread,INITSTK,20,"idle_thread",0);
     write(1,tmp,sprintf(tmp,"XMAIN: Created IDLE_THREAD (PID: %d)...\n",idle_thread_pid));
     ready(idle_thread_pid,1);
-    while(numproc > 1) resched();
+    while(numproc > 1) 
+    {
+        resched();
+    }
 }
 
 void end_game(void)
@@ -95,7 +98,7 @@ void procB(int sem, int pid_procA)
     
     //c. print a message saying that it is awake, and about to signal the semaphore that was passed to it as one of its create arguments 
     write(1,tmp,sprintf(tmp,"B: Awakened. Signaling semaphore...\n"));
-    signal(sem,1);
+    signal(sem);
     
     //d. print another message saying that it’s about to sleep for 2 seconds 
     write(1,tmp,sprintf(tmp,"B: Going to sleep for 2 seconds...\n")); 

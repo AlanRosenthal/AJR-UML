@@ -44,7 +44,9 @@ int	resched()
 	nptr = &proctab[ (currpid = getlast(rdytail)) ];
 	nptr->pstate = PRCURR;		/* mark it currently running	*/
 	preempt = QUANTUM;		/* reset preemption counter	*/
-    swapcontext(&(optr->posix_ctxt),&(nptr->posix_ctxt));
+    
+    //swapcontext(&(optr->posix_ctxt),&(nptr->posix_ctxt));
+    ctxsw(&(optr->posix_ctxt),&(nptr->posix_ctxt));
 
 	/* The OLD process returns here when resumed. */
 	return(OK);

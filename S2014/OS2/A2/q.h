@@ -6,6 +6,16 @@
 #define	NQENT		NPROC + NSEM + NSEM + 4	/* for ready & sleep	*/
 #endif
 
+
+//prototypes for q.c
+int enqueue(int item, int tail);
+int	dequeue(int item);
+int	getfirst(int head);
+int	getlast(int tail);
+int	insert(int proc,int head,int key);
+int	newqueue(void);
+
+
 struct	qent	{		/* one for each process plus two for	*/
 				/* each list				*/
 	short	qkey;		/* key on which the queue is ordered	*/
@@ -25,4 +35,3 @@ extern	int	nextqueue;
 #define firstid(list)	(q[(list)].qnext)
 
 #define	EMPTY	-1		/* equivalent of null pointer		*/
-void printallqueue(int);

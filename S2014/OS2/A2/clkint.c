@@ -20,8 +20,9 @@ void clkint(int signal)
             wakeup();            
         }
     }
-    if (preempt-- == 0)
+    if (--preempt <= 0)
     {
+        preempt = 0; //don't let preempt get to zero
         resched();
     }
 }

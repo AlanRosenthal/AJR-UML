@@ -2,8 +2,8 @@ CC = perl colorgcc.pl
 CFLAGS = -g -c -I. -I/usr/lib/gcc/i686-redhat-linux/4.4.4/include
 CXX_CFLAGS = -I.
 LDFLAGS=
-SOURCES = chprio.c clkinit.c clkint.c create.c freemem.c getitem.c getmem.c \
-getpid.c getprio.c getstk.c initialize.c insert.c insertd.c kill.c newqueue.c queue.c \
+SOURCES = chprio.c clkinit.c clkint.c create.c ctxsw.c  \
+getpid.c getprio.c initialize.c insertd.c kill.c mem.c q.c \
 ready.c receive.c recvclr.c resched.c resume.c screate.c sdelete.c send.c signal.c \
 sleep10.c sleep.c ssclock.c suspend.c userret.c wait.c wakeup.c xinu.c
 OBJECTS = $(SOURCES:.c=.o)
@@ -52,7 +52,7 @@ clkinit.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
 clkinit.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
 clkinit.o: /usr/include/alloca.h /usr/include/ucontext.h
 clkinit.o: /usr/include/sys/ucontext.h ./sleep.h
-clkint.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
+clkint.o: ./sleep.h ./kernel.h ./signal.h /usr/include/features.h
 clkint.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
 clkint.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
 clkint.o: /usr/include/bits/sigset.h /usr/include/bits/types.h
@@ -78,7 +78,7 @@ clkint.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
 clkint.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
 clkint.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
 clkint.o: /usr/include/alloca.h /usr/include/ucontext.h
-clkint.o: /usr/include/sys/ucontext.h ./proc.h ./mem.h ./sleep.h
+clkint.o: /usr/include/sys/ucontext.h ./q.h
 create.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
 create.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
 create.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
@@ -106,87 +106,34 @@ create.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
 create.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
 create.o: /usr/include/alloca.h /usr/include/ucontext.h
 create.o: /usr/include/sys/ucontext.h ./proc.h ./mem.h ./io.h
-freemem.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
-freemem.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
-freemem.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
-freemem.o: /usr/include/bits/sigset.h /usr/include/bits/types.h
-freemem.o: /usr/include/bits/typesizes.h /usr/include/bits/signum.h
-freemem.o: /usr/include/time.h /usr/include/bits/siginfo.h
-freemem.o: /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h
-freemem.o: /usr/include/asm/sigcontext.h /usr/include/linux/types.h
-freemem.o: /usr/include/asm/types.h /usr/include/asm-generic/types.h
-freemem.o: /usr/include/asm-generic/int-ll64.h /usr/include/asm/bitsperlong.h
-freemem.o: /usr/include/asm-generic/bitsperlong.h
-freemem.o: /usr/include/linux/posix_types.h /usr/include/linux/stddef.h
-freemem.o: /usr/include/asm/posix_types.h /usr/include/asm/posix_types_32.h
-freemem.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stddef.h
-freemem.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
-freemem.o: /usr/include/bits/sigthread.h /usr/include/stdio.h
-freemem.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
-freemem.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stdarg.h
-freemem.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
-freemem.o: /usr/include/sys/time.h /usr/include/bits/time.h
-freemem.o: /usr/include/sys/select.h /usr/include/bits/select.h
-freemem.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
-freemem.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
-freemem.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
-freemem.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
-freemem.o: /usr/include/alloca.h /usr/include/ucontext.h
-freemem.o: /usr/include/sys/ucontext.h ./mem.h
-getitem.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
-getitem.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
-getitem.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
-getitem.o: /usr/include/bits/sigset.h /usr/include/bits/types.h
-getitem.o: /usr/include/bits/typesizes.h /usr/include/bits/signum.h
-getitem.o: /usr/include/time.h /usr/include/bits/siginfo.h
-getitem.o: /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h
-getitem.o: /usr/include/asm/sigcontext.h /usr/include/linux/types.h
-getitem.o: /usr/include/asm/types.h /usr/include/asm-generic/types.h
-getitem.o: /usr/include/asm-generic/int-ll64.h /usr/include/asm/bitsperlong.h
-getitem.o: /usr/include/asm-generic/bitsperlong.h
-getitem.o: /usr/include/linux/posix_types.h /usr/include/linux/stddef.h
-getitem.o: /usr/include/asm/posix_types.h /usr/include/asm/posix_types_32.h
-getitem.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stddef.h
-getitem.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
-getitem.o: /usr/include/bits/sigthread.h /usr/include/stdio.h
-getitem.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
-getitem.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stdarg.h
-getitem.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
-getitem.o: /usr/include/sys/time.h /usr/include/bits/time.h
-getitem.o: /usr/include/sys/select.h /usr/include/bits/select.h
-getitem.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
-getitem.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
-getitem.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
-getitem.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
-getitem.o: /usr/include/alloca.h /usr/include/ucontext.h
-getitem.o: /usr/include/sys/ucontext.h ./q.h
-getmem.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
-getmem.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
-getmem.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
-getmem.o: /usr/include/bits/sigset.h /usr/include/bits/types.h
-getmem.o: /usr/include/bits/typesizes.h /usr/include/bits/signum.h
-getmem.o: /usr/include/time.h /usr/include/bits/siginfo.h
-getmem.o: /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h
-getmem.o: /usr/include/asm/sigcontext.h /usr/include/linux/types.h
-getmem.o: /usr/include/asm/types.h /usr/include/asm-generic/types.h
-getmem.o: /usr/include/asm-generic/int-ll64.h /usr/include/asm/bitsperlong.h
-getmem.o: /usr/include/asm-generic/bitsperlong.h
-getmem.o: /usr/include/linux/posix_types.h /usr/include/linux/stddef.h
-getmem.o: /usr/include/asm/posix_types.h /usr/include/asm/posix_types_32.h
-getmem.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stddef.h
-getmem.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
-getmem.o: /usr/include/bits/sigthread.h /usr/include/stdio.h
-getmem.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
-getmem.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stdarg.h
-getmem.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
-getmem.o: /usr/include/sys/time.h /usr/include/bits/time.h
-getmem.o: /usr/include/sys/select.h /usr/include/bits/select.h
-getmem.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
-getmem.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
-getmem.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
-getmem.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
-getmem.o: /usr/include/alloca.h /usr/include/ucontext.h
-getmem.o: /usr/include/sys/ucontext.h ./mem.h
+create.o: /usr/include/string.h /usr/include/xlocale.h
+ctxsw.o: ./signal.h /usr/include/features.h /usr/include/sys/cdefs.h
+ctxsw.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+ctxsw.o: /usr/include/gnu/stubs-32.h /usr/include/bits/sigset.h
+ctxsw.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
+ctxsw.o: /usr/include/bits/signum.h /usr/include/time.h
+ctxsw.o: /usr/include/bits/siginfo.h /usr/include/bits/sigaction.h
+ctxsw.o: /usr/include/bits/sigcontext.h /usr/include/asm/sigcontext.h
+ctxsw.o: /usr/include/linux/types.h /usr/include/asm/types.h
+ctxsw.o: /usr/include/asm-generic/types.h /usr/include/asm-generic/int-ll64.h
+ctxsw.o: /usr/include/asm/bitsperlong.h
+ctxsw.o: /usr/include/asm-generic/bitsperlong.h
+ctxsw.o: /usr/include/linux/posix_types.h /usr/include/linux/stddef.h
+ctxsw.o: /usr/include/asm/posix_types.h /usr/include/asm/posix_types_32.h
+ctxsw.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stddef.h
+ctxsw.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
+ctxsw.o: /usr/include/bits/sigthread.h ./kernel.h /usr/include/stdio.h
+ctxsw.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
+ctxsw.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stdarg.h
+ctxsw.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+ctxsw.o: /usr/include/sys/time.h /usr/include/bits/time.h
+ctxsw.o: /usr/include/sys/select.h /usr/include/bits/select.h
+ctxsw.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
+ctxsw.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
+ctxsw.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
+ctxsw.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
+ctxsw.o: /usr/include/alloca.h /usr/include/ucontext.h
+ctxsw.o: /usr/include/sys/ucontext.h ./proc.h
 getpid.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
 getpid.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
 getpid.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
@@ -241,33 +188,6 @@ getprio.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
 getprio.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
 getprio.o: /usr/include/alloca.h /usr/include/ucontext.h
 getprio.o: /usr/include/sys/ucontext.h ./proc.h
-getstk.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
-getstk.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
-getstk.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
-getstk.o: /usr/include/bits/sigset.h /usr/include/bits/types.h
-getstk.o: /usr/include/bits/typesizes.h /usr/include/bits/signum.h
-getstk.o: /usr/include/time.h /usr/include/bits/siginfo.h
-getstk.o: /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h
-getstk.o: /usr/include/asm/sigcontext.h /usr/include/linux/types.h
-getstk.o: /usr/include/asm/types.h /usr/include/asm-generic/types.h
-getstk.o: /usr/include/asm-generic/int-ll64.h /usr/include/asm/bitsperlong.h
-getstk.o: /usr/include/asm-generic/bitsperlong.h
-getstk.o: /usr/include/linux/posix_types.h /usr/include/linux/stddef.h
-getstk.o: /usr/include/asm/posix_types.h /usr/include/asm/posix_types_32.h
-getstk.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stddef.h
-getstk.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
-getstk.o: /usr/include/bits/sigthread.h /usr/include/stdio.h
-getstk.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
-getstk.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stdarg.h
-getstk.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
-getstk.o: /usr/include/sys/time.h /usr/include/bits/time.h
-getstk.o: /usr/include/sys/select.h /usr/include/bits/select.h
-getstk.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
-getstk.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
-getstk.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
-getstk.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
-getstk.o: /usr/include/alloca.h /usr/include/ucontext.h
-getstk.o: /usr/include/sys/ucontext.h ./mem.h
 initialize.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
 initialize.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
 initialize.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
@@ -298,34 +218,8 @@ initialize.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
 initialize.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
 initialize.o: /usr/include/alloca.h /usr/include/ucontext.h
 initialize.o: /usr/include/sys/ucontext.h ./proc.h ./sem.h ./sleep.h ./mem.h
-initialize.o: ./q.h ./io.h
-insert.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
-insert.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
-insert.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
-insert.o: /usr/include/bits/sigset.h /usr/include/bits/types.h
-insert.o: /usr/include/bits/typesizes.h /usr/include/bits/signum.h
-insert.o: /usr/include/time.h /usr/include/bits/siginfo.h
-insert.o: /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h
-insert.o: /usr/include/asm/sigcontext.h /usr/include/linux/types.h
-insert.o: /usr/include/asm/types.h /usr/include/asm-generic/types.h
-insert.o: /usr/include/asm-generic/int-ll64.h /usr/include/asm/bitsperlong.h
-insert.o: /usr/include/asm-generic/bitsperlong.h
-insert.o: /usr/include/linux/posix_types.h /usr/include/linux/stddef.h
-insert.o: /usr/include/asm/posix_types.h /usr/include/asm/posix_types_32.h
-insert.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stddef.h
-insert.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
-insert.o: /usr/include/bits/sigthread.h /usr/include/stdio.h
-insert.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
-insert.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stdarg.h
-insert.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
-insert.o: /usr/include/sys/time.h /usr/include/bits/time.h
-insert.o: /usr/include/sys/select.h /usr/include/bits/select.h
-insert.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
-insert.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
-insert.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
-insert.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
-insert.o: /usr/include/alloca.h /usr/include/ucontext.h
-insert.o: /usr/include/sys/ucontext.h ./q.h
+initialize.o: ./tty.h ./q.h ./io.h /usr/include/string.h
+initialize.o: /usr/include/xlocale.h
 insertd.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
 insertd.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
 insertd.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
@@ -380,62 +274,60 @@ kill.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
 kill.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
 kill.o: /usr/include/alloca.h /usr/include/ucontext.h
 kill.o: /usr/include/sys/ucontext.h ./proc.h ./sem.h ./mem.h ./io.h
-newqueue.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
-newqueue.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
-newqueue.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
-newqueue.o: /usr/include/bits/sigset.h /usr/include/bits/types.h
-newqueue.o: /usr/include/bits/typesizes.h /usr/include/bits/signum.h
-newqueue.o: /usr/include/time.h /usr/include/bits/siginfo.h
-newqueue.o: /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h
-newqueue.o: /usr/include/asm/sigcontext.h /usr/include/linux/types.h
-newqueue.o: /usr/include/asm/types.h /usr/include/asm-generic/types.h
-newqueue.o: /usr/include/asm-generic/int-ll64.h
-newqueue.o: /usr/include/asm/bitsperlong.h
-newqueue.o: /usr/include/asm-generic/bitsperlong.h
-newqueue.o: /usr/include/linux/posix_types.h /usr/include/linux/stddef.h
-newqueue.o: /usr/include/asm/posix_types.h /usr/include/asm/posix_types_32.h
-newqueue.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stddef.h
-newqueue.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
-newqueue.o: /usr/include/bits/sigthread.h /usr/include/stdio.h
-newqueue.o: /usr/include/libio.h /usr/include/_G_config.h
-newqueue.o: /usr/include/wchar.h
-newqueue.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stdarg.h
-newqueue.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
-newqueue.o: /usr/include/sys/time.h /usr/include/bits/time.h
-newqueue.o: /usr/include/sys/select.h /usr/include/bits/select.h
-newqueue.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
-newqueue.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
-newqueue.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
-newqueue.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
-newqueue.o: /usr/include/alloca.h /usr/include/ucontext.h
-newqueue.o: /usr/include/sys/ucontext.h ./q.h
-queue.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
-queue.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
-queue.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
-queue.o: /usr/include/bits/sigset.h /usr/include/bits/types.h
-queue.o: /usr/include/bits/typesizes.h /usr/include/bits/signum.h
-queue.o: /usr/include/time.h /usr/include/bits/siginfo.h
-queue.o: /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h
-queue.o: /usr/include/asm/sigcontext.h /usr/include/linux/types.h
-queue.o: /usr/include/asm/types.h /usr/include/asm-generic/types.h
-queue.o: /usr/include/asm-generic/int-ll64.h /usr/include/asm/bitsperlong.h
-queue.o: /usr/include/asm-generic/bitsperlong.h
-queue.o: /usr/include/linux/posix_types.h /usr/include/linux/stddef.h
-queue.o: /usr/include/asm/posix_types.h /usr/include/asm/posix_types_32.h
-queue.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stddef.h
-queue.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
-queue.o: /usr/include/bits/sigthread.h /usr/include/stdio.h
-queue.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
-queue.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stdarg.h
-queue.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
-queue.o: /usr/include/sys/time.h /usr/include/bits/time.h
-queue.o: /usr/include/sys/select.h /usr/include/bits/select.h
-queue.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
-queue.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
-queue.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
-queue.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
-queue.o: /usr/include/alloca.h /usr/include/ucontext.h
-queue.o: /usr/include/sys/ucontext.h ./q.h
+mem.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
+mem.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
+mem.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
+mem.o: /usr/include/bits/sigset.h /usr/include/bits/types.h
+mem.o: /usr/include/bits/typesizes.h /usr/include/bits/signum.h
+mem.o: /usr/include/time.h /usr/include/bits/siginfo.h
+mem.o: /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h
+mem.o: /usr/include/asm/sigcontext.h /usr/include/linux/types.h
+mem.o: /usr/include/asm/types.h /usr/include/asm-generic/types.h
+mem.o: /usr/include/asm-generic/int-ll64.h /usr/include/asm/bitsperlong.h
+mem.o: /usr/include/asm-generic/bitsperlong.h
+mem.o: /usr/include/linux/posix_types.h /usr/include/linux/stddef.h
+mem.o: /usr/include/asm/posix_types.h /usr/include/asm/posix_types_32.h
+mem.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stddef.h
+mem.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
+mem.o: /usr/include/bits/sigthread.h /usr/include/stdio.h
+mem.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
+mem.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stdarg.h
+mem.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+mem.o: /usr/include/sys/time.h /usr/include/bits/time.h
+mem.o: /usr/include/sys/select.h /usr/include/bits/select.h
+mem.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
+mem.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
+mem.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
+mem.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
+mem.o: /usr/include/alloca.h /usr/include/ucontext.h
+mem.o: /usr/include/sys/ucontext.h ./mem.h
+q.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
+q.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
+q.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
+q.o: /usr/include/bits/sigset.h /usr/include/bits/types.h
+q.o: /usr/include/bits/typesizes.h /usr/include/bits/signum.h
+q.o: /usr/include/time.h /usr/include/bits/siginfo.h
+q.o: /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h
+q.o: /usr/include/asm/sigcontext.h /usr/include/linux/types.h
+q.o: /usr/include/asm/types.h /usr/include/asm-generic/types.h
+q.o: /usr/include/asm-generic/int-ll64.h /usr/include/asm/bitsperlong.h
+q.o: /usr/include/asm-generic/bitsperlong.h /usr/include/linux/posix_types.h
+q.o: /usr/include/linux/stddef.h /usr/include/asm/posix_types.h
+q.o: /usr/include/asm/posix_types_32.h
+q.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stddef.h
+q.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
+q.o: /usr/include/bits/sigthread.h /usr/include/stdio.h /usr/include/libio.h
+q.o: /usr/include/_G_config.h /usr/include/wchar.h
+q.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stdarg.h
+q.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+q.o: /usr/include/sys/time.h /usr/include/bits/time.h
+q.o: /usr/include/sys/select.h /usr/include/bits/select.h
+q.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
+q.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
+q.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
+q.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
+q.o: /usr/include/alloca.h /usr/include/ucontext.h
+q.o: /usr/include/sys/ucontext.h ./q.h
 ready.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
 ready.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
 ready.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
@@ -868,3 +760,30 @@ wakeup.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
 wakeup.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
 wakeup.o: /usr/include/alloca.h /usr/include/ucontext.h
 wakeup.o: /usr/include/sys/ucontext.h ./proc.h ./q.h ./sleep.h
+xinu.o: ./kernel.h ./signal.h /usr/include/features.h
+xinu.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
+xinu.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
+xinu.o: /usr/include/bits/sigset.h /usr/include/bits/types.h
+xinu.o: /usr/include/bits/typesizes.h /usr/include/bits/signum.h
+xinu.o: /usr/include/time.h /usr/include/bits/siginfo.h
+xinu.o: /usr/include/bits/sigaction.h /usr/include/bits/sigcontext.h
+xinu.o: /usr/include/asm/sigcontext.h /usr/include/linux/types.h
+xinu.o: /usr/include/asm/types.h /usr/include/asm-generic/types.h
+xinu.o: /usr/include/asm-generic/int-ll64.h /usr/include/asm/bitsperlong.h
+xinu.o: /usr/include/asm-generic/bitsperlong.h
+xinu.o: /usr/include/linux/posix_types.h /usr/include/linux/stddef.h
+xinu.o: /usr/include/asm/posix_types.h /usr/include/asm/posix_types_32.h
+xinu.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stddef.h
+xinu.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
+xinu.o: /usr/include/bits/sigthread.h /usr/include/stdio.h
+xinu.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
+xinu.o: /usr/lib/gcc/i686-redhat-linux/4.4.4/include/stdarg.h
+xinu.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+xinu.o: /usr/include/sys/time.h /usr/include/bits/time.h
+xinu.o: /usr/include/sys/select.h /usr/include/bits/select.h
+xinu.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
+xinu.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
+xinu.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
+xinu.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
+xinu.o: /usr/include/alloca.h /usr/include/ucontext.h
+xinu.o: /usr/include/sys/ucontext.h ./proc.h ./sem.h ./q.h
