@@ -20,3 +20,7 @@
 
 #racket files
 *.rkt#?#
+
+#makefile backups
+Makefile.bak
+
