@@ -132,7 +132,6 @@ LOCAL sysinit(void)
     pptr->pstate = PRCURR;
     pptr->pprio = 0;
     strcpy(pptr->pname, "Null Proc");
-    pptr->paddr = (void*) xmain;
     pptr->phasmsg = FALSE;
     
     pptr->posix_ctxt = posix_ctxt_init;

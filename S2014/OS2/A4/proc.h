@@ -37,7 +37,6 @@ struct  pentry  {
     int pmsg;           /* message sent to this process */
     Bool phasmsg;       /* True iff pmsg is valid   */
     char pname[PNMLEN];     /* process name         */
-    void (*paddr)();     /* initial code address     */
     ucontext_t posix_ctxt;  /* POSIX context struct     */
 };
 
