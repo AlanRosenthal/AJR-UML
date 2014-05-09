@@ -1,0 +1,30 @@
+Degree of Success
+100%
+My xinu modifications worked.  I was able to get everything working without segfaulting/producing unexpected results.
+
+Approach
+I used linux reads and writes to do this assignment.
+
+In my idle thread I am constantly listening for IO.  I modified read so it did nonblocking IO by ysing O_NONBLOCK file flag.  It returns -1 and errno = EAGAIN when nothing is read.  When nothing is read, I sleep for half a second.
+
+When I have things to read, I tokenize the input using space and endline as the tokens.  I check if the first token is equal to "show", "create", "resume", "suspend", "kill", "sem", or "help".  Anything else returns an error message for the user.
+
+If "show" is the first token then the next token can be "proc", "priority", "sleep", or "sem".  This will walk down the queues/list and display the approcate information to the user. 
+
+If "create" is the first token then the next token can be "procA", "procB", or "procC".  These will call the proc commands with the approraite arguments. If not enough argumnets are specified then the system will output the required help message.
+
+If "resume" is called then the resume command is called on the next token (after converting it to an int).
+
+If "suspend" is called then then suspend command is called on the next token (after converting it to an int).
+
+If "kill" is called then the kill command is called on the next token (after converting it to an int).
+
+If "sem" is called the next token can be either "create" or "signal".  This will all you to create or signal a semaphore.
+
+The final command is "help" which will show help messages to the user.
+
+I tested this by running the first assignment through the command line.  First I create a semaphore and the ID is printed on the screen.  I then create procA, and pass it the semaphore ID.  I then resume procA since it is intially created on the suspend queue.  procA is waiting for a semaphore.  I then create procB, and pass it the sempahore ID andprocA's pid (which was printed on the screen).  After resuming processes B, it signals A's semaphore.  Then it sends a message to B and terminates.
+
+
+Email Address
+alan_rosenthal@student.uml.edu
