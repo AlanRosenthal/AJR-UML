@@ -1,0 +1,55 @@
+Assignment 4
+I modified xinu to compile and run on a 64 bit machine.  I also cleaned up the code that wasn't ever being used.
+
+I removed the -m32 flag from gcc so it would compile correctly.
+
+This caused a lot of errors since the sizeof(int) = 4 but the sizeof(void*) = 8.  
+
+I went through the entire code and fixed these errors.
+
+In proc.h I modified the pentry struct.
+
+Old: 
+struct  pentry  {
+    char    pstate;         /* process state: PRCURR, etc.  */
+    int pprio;          /* process priority     */
+    int psem;           /* semaphore if process waiting */
+    int pmsg;           /* message sent to this process */
+    Bool    phasmsg;        /* True iff pmsg is valid   */
+    int pbase;          /* base of run time stack   */
+    int pstklen;        /* stack length         */
+    int plimit;         /* lowest extent of stack   */
+    char    pname[PNMLEN];      /* process name         */
+    int pargs;          /* initial number of arguments  */
+    void    (*paddr)();     /* initial code address     */
+    ucontext_t posix_ctxt;  /* POSIX context struct     */
+};
+
+New:
+struct  pentry  {
+    char pstate;            /* process state: PRCURR, etc.  */
+    int pprio;          /* process priority     */
+    int psem;           /* semaphore if process waiting */
+    int pmsg;           /* message sent to this process */
+    Bool phasmsg;       /* True iff pmsg is valid   */
+    char pname[PNMLEN];     /* process name         */
+    ucontext_t posix_ctxt;  /* POSIX context struct     */
+};
+
+I removed the following entries:  pbase, psktlen, plimit, pargs, and paddr.  This is because these were not needed or used.  All of this information is in the ucontext structure.  For example, the stack size and base are all elements of the ucontext strct.  
+
+Instead of using the built-in memory allocation system, which annoyingly returned the bottom of the stack instead of the top (which is required for the ucontext structure), I replaced the calls with malloc() and free().  This is so they could easily be replaced later.  I attempted to create my own memory allocation system, but I was not able to.
+
+I used a VA_LIST to get the varaiable arguments passed to create(). 
+
+I looked into using the sys/queue.h linux library.  I deteremined this was necessary because the xinu-queue library felt incomplete and poorly implemeneted.
+
+I also went through the majority of the code and removed state from the if-statements.  Typically I set variables before if-statements then use the if-statement to check their value.  I find this way is easier to debug.
+
+I attmepted to do A4, but I was not able to get it working in the time I alloted to it.  I hope this attempt a another project will count for partial credit.
+
+At the current state, xinu works running on my 64bit system.
+
+
+EMail Address
+Alan_rosenthal@student.uml.edu
