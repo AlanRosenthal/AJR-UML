@@ -1,0 +1,46 @@
+Level of Success
+100%
+
+Approach
+I edited proc.h to include a ucontext structure in the pentry struct.  This allows to use contexting switching in linux.
+
+I created a null_process that entered xmain().  This was the start of the "xinu" system after it started.  After xmain ended it went to end_game() to exit the world.
+
+xmain() creates idle_thread() which will launch the other processes.  xmain() checks to see if the number of processes are greater than one (himself).  If he's the only one left he commits suicide by falling off the edge of the world.
+
+A semaphore is created by idle_thread().  Then idle_thread() creates three processes using the modified create() call.
+
+create() sets up process by creating a pid, setting up its pentry struct, setting up its ucontext struct and setting up its end of world, userret().
+
+The three processes created by idle_thread are procA, procB, and procC.
+
+procA is created and passed the id of the semaphore created.
+
+procB is created and passed the id of the semaphore and the PID of procA.
+
+procC is created and passed the idle_thread's PID and a timeout value.
+
+A waits for the semaphore.
+
+B eventually signals the sephamore
+
+C goes to sleep for timeout value.
+
+A waits for a message.
+
+B sends A a message.
+
+A terminates.
+
+B terminates.
+
+The idle_thread terminates.
+
+C terminates.
+
+xmain() realizes he's the only person left alive and kills himself.
+
+
+Email Address
+alan_rosenthal@student.uml.edu
+
