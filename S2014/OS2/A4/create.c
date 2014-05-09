@@ -3,8 +3,8 @@
 #include <conf.h>
 #include <kernel.h>
 #include <proc.h>
-#include <mem.h>
 #include <io.h>
+#include <stdarg.h>
 
 LOCAL newpid();
 
@@ -18,24 +18,26 @@ LOCAL newpid();
 //name (for debugging)
 //number of args
 //argments
-SYSCALL create(int *procaddr,int ssize,int priority,char *name,int nargs,int args)
+SYSCALL create(int *procaddr,int ssize,int priority,char *name,int nargs,...)
 {
     int pid;            /* stores new process id    */
     struct  pentry  *pptr;      /* pointer to proc. table entry */
     int *saddr;         /* stack address        */
+    va_list args;
     sigset_t ps;            /* saved processor status   */
     disable(ps);
-    ssize = roundew(ssize);
     pid = newpid();
     if ((ssize < MINSTK) || (pid == SYSERR) || (priority < 1))
     {
         restore(ps);
         return(SYSERR);
     }
-    if ((int)(saddr = getstk(ssize)) == SYSERR)
+    saddr = malloc(ssize);
+    if (saddr == NULL)
     {
         proctab[pid].pstate=PRFREE; //free pid
         restore(ps);
+        perror("malloc failed ");
         return(SYSERR);
     }
 
@@ -44,34 +46,43 @@ SYSCALL create(int *procaddr,int ssize,int priority,char *name,int nargs,int arg
     pptr->pstate = PRSUSP;
     strcpy(pptr->pname,name);
     pptr->pprio = priority;
-    pptr->pbase = (int) saddr;
-    pptr->pstklen = ssize;
     pptr->psem = 0;
     pptr->phasmsg = FALSE;
-    pptr->plimit = (int)(saddr - ssize + 1);
-    pptr->pargs = nargs;
     
     pptr->posix_ctxt = posix_ctxt_init;
     pptr->posix_ctxt.uc_stack.ss_size = ssize;
-    pptr->posix_ctxt.uc_stack.ss_sp = (void*)((int) saddr - ssize + 1);
+    pptr->posix_ctxt.uc_stack.ss_sp = malloc(ssize);
     pptr->posix_ctxt.uc_stack.ss_flags = 0;
     pptr->posix_ctxt.uc_link = &return_ctxt;
+    va_start(args,nargs);
     switch (nargs)
     {
         case 0:
             makecontext(&(pptr->posix_ctxt),(void *)procaddr,0);
             break;
         case 1:
-            makecontext(&(pptr->posix_ctxt),(void *)procaddr,1,args);
+        {
+            int arg1 = va_arg(args,int);
+            makecontext(&(pptr->posix_ctxt),(void *)procaddr,1,arg1);
             break;
+        }
         case 2:
-            makecontext(&(pptr->posix_ctxt),(void *)procaddr,2,args,*(&args+1));
+        {
+            int arg1 = va_arg(args,int);
+            int arg2 = va_arg(args,int);
+            makecontext(&(pptr->posix_ctxt),(void *)procaddr,2,arg1,arg2);
             break;
+        }
         case 3:
-            makecontext(&(pptr->posix_ctxt),(void *)procaddr,3,args,*(&args+1),*(&args+2));
+        {
+            int arg1 = va_arg(args,int);
+            int arg2 = va_arg(args,int);
+            int arg3 = va_arg(args,int);
+            makecontext(&(pptr->posix_ctxt),(void *)procaddr,3,arg1,arg2,arg3);
             break;
+        }
     }
-    
+    va_end(args);
     restore(ps);
     return(pid);
 }

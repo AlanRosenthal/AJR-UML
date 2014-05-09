@@ -1,13 +1,13 @@
 CC = perl colorgcc.pl
-CFLAGS = -g -c -I. -I/usr/lib/gcc/x86_64-linux-gnu/4.6.3/include -m32
+CFLAGS = -g -c -I. -I/usr/lib/gcc/x86_64-linux-gnu/4.6.3/include
 CXX_CFLAGS = -I.
-LDFLAGS= -m32
+LDFLAGS=
 SOURCES = chprio.c clkinit.c clkint.c create.c ctxsw.c  \
-getpid.c getprio.c initialize.c insertd.c kill.c mem.c print.c q.c \
+getpid.c getprio.c initialize.c insertd.c kill.c print.c q.c \
 ready.c receive.c recvclr.c resched.c resume.c screate.c sdelete.c send.c signal.c \
 sleep10.c sleep.c ssclock.c suspend.c userret.c wait.c wakeup.c xinu.c
 OBJECTS = $(SOURCES:.c=.o)
-EXECUTABLE = xinu
+EXECUTABLE = xinu64
 
 
 all: $(SOURCES) $(EXECUTABLE)
@@ -111,7 +111,7 @@ create.o: /usr/include/errno.h /usr/include/bits/errno.h
 create.o: /usr/include/linux/errno.h /usr/include/asm/errno.h
 create.o: /usr/include/asm-generic/errno.h
 create.o: /usr/include/asm-generic/errno-base.h /usr/include/string.h
-create.o: /usr/include/xlocale.h ./proc.h ./mem.h ./io.h
+create.o: /usr/include/xlocale.h ./proc.h ./io.h
 ctxsw.o: ./signal.h /usr/include/features.h /usr/include/bits/predefs.h
 ctxsw.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
 ctxsw.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h
@@ -227,8 +227,8 @@ initialize.o: /usr/include/errno.h /usr/include/bits/errno.h
 initialize.o: /usr/include/linux/errno.h /usr/include/asm/errno.h
 initialize.o: /usr/include/asm-generic/errno.h
 initialize.o: /usr/include/asm-generic/errno-base.h /usr/include/string.h
-initialize.o: /usr/include/xlocale.h ./proc.h ./sem.h ./sleep.h ./mem.h
-initialize.o: ./tty.h ./q.h ./io.h
+initialize.o: /usr/include/xlocale.h ./proc.h ./sem.h ./sleep.h ./tty.h ./q.h
+initialize.o: ./io.h
 insertd.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
 insertd.o: /usr/include/bits/predefs.h /usr/include/sys/cdefs.h
 insertd.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
@@ -286,35 +286,7 @@ kill.o: /usr/include/errno.h /usr/include/bits/errno.h
 kill.o: /usr/include/linux/errno.h /usr/include/asm/errno.h
 kill.o: /usr/include/asm-generic/errno.h
 kill.o: /usr/include/asm-generic/errno-base.h /usr/include/string.h
-kill.o: /usr/include/xlocale.h ./proc.h ./sem.h ./mem.h ./io.h
-mem.o: ./conf.h ./kernel.h ./signal.h /usr/include/features.h
-mem.o: /usr/include/bits/predefs.h /usr/include/sys/cdefs.h
-mem.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
-mem.o: /usr/include/gnu/stubs-64.h /usr/include/bits/sigset.h
-mem.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
-mem.o: /usr/include/bits/signum.h /usr/include/time.h
-mem.o: /usr/include/bits/siginfo.h /usr/include/bits/sigaction.h
-mem.o: /usr/include/bits/sigcontext.h
-mem.o: /usr/lib/gcc/x86_64-linux-gnu/4.6.3/include/stddef.h
-mem.o: /usr/include/bits/sigstack.h /usr/include/bits/pthreadtypes.h
-mem.o: /usr/include/bits/sigthread.h /usr/include/stdio.h
-mem.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
-mem.o: /usr/lib/gcc/x86_64-linux-gnu/4.6.3/include/stdarg.h
-mem.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
-mem.o: /usr/include/sys/time.h /usr/include/bits/time.h
-mem.o: /usr/include/sys/select.h /usr/include/bits/select.h
-mem.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
-mem.o: /usr/include/bits/waitstatus.h /usr/include/endian.h
-mem.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
-mem.o: /usr/include/sys/types.h /usr/include/sys/sysmacros.h
-mem.o: /usr/include/alloca.h /usr/include/ucontext.h
-mem.o: /usr/include/sys/ucontext.h /usr/include/limits.h
-mem.o: /usr/include/bits/posix1_lim.h /usr/include/bits/local_lim.h
-mem.o: /usr/include/linux/limits.h /usr/include/bits/posix2_lim.h
-mem.o: /usr/include/errno.h /usr/include/bits/errno.h
-mem.o: /usr/include/linux/errno.h /usr/include/asm/errno.h
-mem.o: /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h
-mem.o: /usr/include/string.h /usr/include/xlocale.h ./mem.h
+kill.o: /usr/include/xlocale.h ./proc.h ./sem.h ./io.h
 print.o: ./kernel.h ./signal.h /usr/include/features.h
 print.o: /usr/include/bits/predefs.h /usr/include/sys/cdefs.h
 print.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h

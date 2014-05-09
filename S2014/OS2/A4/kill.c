@@ -4,7 +4,6 @@
 #include <kernel.h>
 #include <proc.h>
 #include <sem.h>
-#include <mem.h>
 #include <io.h>
 
 /*------------------------------------------------------------------------
@@ -21,7 +20,9 @@ SYSCALL kill(int pid)			/* process to kill              */
 		restore(ps);
 		return(SYSERR);
 	}
-	freestk(pptr->pbase, pptr->pstklen);
+	//freestk(pptr->pbase, pptr->pstklen);
+	free(pptr->posix_ctxt.uc_stack.ss_sp);
+	
 	switch (pptr->pstate) {
 
 	  case PRCURR:	pptr->pstate = PRFREE;	/* suicide */

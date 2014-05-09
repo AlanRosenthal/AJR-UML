@@ -5,7 +5,6 @@
 #include <proc.h>
 #include <sem.h>
 #include <sleep.h>
-#include <mem.h>
 #include <tty.h>
 #include <q.h>
 #include <io.h>
@@ -26,11 +25,9 @@ struct  sentry  semaph[NSEM];   /* semaphore table          */
 int nextsem;        /* next semaphore slot to use in screate*/
 struct  qent    q[NQENT];   /* q table (see queue.c)        */
 int nextqueue;      /* next slot in q structure to use  */
-int *maxaddr;       /* max memory address (set by sizmem)   */
 #ifdef  NDEVS
 struct  intmap  intmap[NDEVS];  /* interrupt dispatch table     */
 #endif
-struct  mblock  memlist;    /* list of free memory blocks       */
 #ifdef  Ntty
 struct  tty     tty[Ntty];  /* SLU buffers and mode control     */
 #endif
@@ -80,9 +77,14 @@ int main(int argc,char * argv[])                /* babysit CPU when no one home 
 
     //set up the edge of the world
     end_game_ctxt = posix_ctxt_init;
-    end_game_ctxt.uc_stack.ss_sp = (void*)((int)getstk(MINSTK)-MINSTK+1);
+    end_game_ctxt.uc_stack.ss_sp = malloc(MINSTK);
     end_game_ctxt.uc_stack.ss_size = MINSTK;
     end_game_ctxt.uc_stack.ss_flags = 0;
+    if (end_game_ctxt.uc_stack.ss_sp == NULL)
+    {
+        perror("malloc failed ");
+        return(SYSERR);
+    }
     makecontext(&end_game_ctxt, end_game, 0);
 
 
@@ -112,7 +114,6 @@ LOCAL sysinit(void)
     int i;
     struct  pentry  *pptr;
     struct  sentry  *sptr;
-    struct  mblock  *mptr;
 
     write(1,"INITIALIZING SYSTEM...\n",23);
     //setup full block and full unblock
@@ -124,15 +125,6 @@ LOCAL sysinit(void)
     nextsem  = NSEM-1;
     nextqueue= NPROC;       /* q[0..NPROC-1] are processes */
 
-    memlist.mnext = mptr = (struct mblock *) malloc(FREE_SIZE);
-    if (mptr == NULL)
-    {
-        perror("malloc failed ");
-        exit(3);
-    }
-    mptr->mnext = (struct mblock *)NULL;
-    mptr->mlen =truncew((FREE_SIZE)-(NULLSTK));
-
     for (i=0 ; i<NPROC ; i++)   /* initialize process table */
         proctab[i].pstate = PRFREE;
 
@@ -140,21 +132,21 @@ LOCAL sysinit(void)
     pptr->pstate = PRCURR;
     pptr->pprio = 0;
     strcpy(pptr->pname, "Null Proc");
-    pptr->plimit = ((int)mptr + (FREE_SIZE) - (NULLSTK) -1);
-    pptr->pbase = (int)mptr + (FREE_SIZE) - 1;
-    *((int *)pptr->pbase) = MAGIC;
     pptr->paddr = (void*) xmain;
     pptr->phasmsg = FALSE;
-    pptr->pargs = 0;
     
     pptr->posix_ctxt = posix_ctxt_init;
-    pptr->posix_ctxt.uc_stack.ss_sp = (void *)pptr->plimit;
+    pptr->posix_ctxt.uc_stack.ss_sp = malloc(NULLSTK);
     pptr->posix_ctxt.uc_stack.ss_size = NULLSTK;
     pptr->posix_ctxt.uc_stack.ss_flags = 0;
     pptr->posix_ctxt.uc_link = &end_game_ctxt;
+    if (pptr->posix_ctxt.uc_stack.ss_sp == NULL)
+    {
+        perror("malloc failed ");
+        return(SYSERR);
+    }
     makecontext(&(pptr->posix_ctxt),xmain,0);
     currpid = NULLPROC;
-
     for (i=0 ; i<NSEM ; i++) {  /* initialize semaphores */
         (sptr = &semaph[i])->sstate = SFREE;
         sptr->sqtail = 1 + (sptr->sqhead = newqueue());
@@ -163,9 +155,14 @@ LOCAL sysinit(void)
     rdytail = 1 + (rdyhead=newqueue());/* initialize ready list */
 
     return_ctxt = posix_ctxt_init;
-    return_ctxt.uc_stack.ss_sp = (void*)((int)getstk(MINSTK)-MINSTK+1);
+    return_ctxt.uc_stack.ss_sp = malloc(MINSTK);
     return_ctxt.uc_stack.ss_size = MINSTK;
     return_ctxt.uc_stack.ss_flags = 0;
+    if (return_ctxt.uc_stack.ss_sp == NULL)
+    {
+        perror("malloc failed ");
+        return(SYSERR);
+    }
     makecontext(&return_ctxt,(void*) userret, 0);
 
     clkinit();          /* initialize r.t.clock */
